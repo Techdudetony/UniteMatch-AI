@@ -18,3 +18,4 @@ node_modules/
 *.sqlite3
 *.zip
 *.png
+!app/visuals/*.png
