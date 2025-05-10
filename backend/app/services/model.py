@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score, confusion_matrix
 from app.data.loader import load_data
-from app.visuals import plot_confusion_matrix, plot_feature_importance
+from app.visuals import plot_confusion_matrix, plot_feature_importance, plot_correlation
 
 def build_model(tune: bool = False):
     df, _ = load_data()
@@ -15,6 +15,8 @@ def build_model(tune: bool = False):
     
     X = df[features]
     y = df[target]
+    
+    plot_correlation(df, features)
     
     # Encode target labels
     encoder = LabelEncoder()

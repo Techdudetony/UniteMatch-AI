@@ -2,7 +2,8 @@ import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
-import numpy as np
+import pandas as pd
+from pandas import DataFrame
 
 CHART_DIR = os.path.join(os.path.dirname(__file__), "charts")
 os.makedirs(CHART_DIR, exist_ok=True)
@@ -34,3 +35,17 @@ def plot_confusion_matrix(y_true, y_pred, labels):
     ax.set_xlabel("Predicted")
     ax.set_ylabel("Actual")
     return save_chart(fig, "confusion_matrix.png")
+
+def plot_correlation(df: DataFrame, features: list[str], save_path: str = "correlation_heatmap.png") -> None:
+    corr = df[features].corr()
+    
+    # Save numeric correlation matrix as CSV
+    csv_path = save_path.replace(".png", ".csv")
+    corr.to_csv(csv_path)
+    
+    fig, ax = plt.subplots()
+    sns.heatmap(corr, annot=True, ax=ax)
+    plt.title("Feature correlation Matrix")
+    plt.tight_layout()
+    save_chart(fig, save_path)
+    plt.close()
