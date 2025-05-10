@@ -17,5 +17,3 @@ node_modules/
 .DS_Store
 *.sqlite3
 *.zip
-*.png
-!app/visuals/*.png
