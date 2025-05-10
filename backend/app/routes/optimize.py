@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from app.services.model import optimize_team
+from app.services.model import optimize_team, build_model
 
 router = APIRouter()
 
@@ -12,5 +12,19 @@ def optimize(request: TeamRequest):
     try:
         result = optimize_team(request.team)
         return {"optimized": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.get("/train-model")
+def train_model():
+    try:
+        result = build_model(tune=True)
+        return {
+            "accuracy": result["accuracy"],
+            "best_params": result["best_params"],
+            "confusion_matrix": result["confusion_matrix"],
+            "feature_importance": dict(zip(result["features"], result["feature_importance"])),
+            "classes": result["classes"]
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

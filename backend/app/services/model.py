@@ -1,10 +1,11 @@
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.preprocessing import LabelEncoder
-import pandas as pd
+from sklearn.metrics import accuracy_score, confusion_matrix
 from app.data.loader import load_data
+from app.visuals import plot_confusion_matrix, plot_feature_importance
 
-def build_model():
+def build_model(tune: bool = False):
     df, _ = load_data()
     seed=123845
     
@@ -23,40 +24,69 @@ def build_model():
     X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, random_state=seed)
     
     # Train model
-    clf = DecisionTreeClassifier(max_depth=5, random_state=seed)
-    clf.fit(X_train, y_train)
+    if tune:
+        param_grid = {
+            "n_estimators": [100, 150],
+            "max_depth": [3, 5],
+            "min_samples_split": [2, 3]
+        }
+        
+        grid = GridSearchCV(RandomForestClassifier(random_state=seed), param_grid, cv=3)
+        grid.fit(X_train, y_train)
+        clf = grid.best_estimator_
+        best_params = grid.best_params_
+    else:
+        clf = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=seed)
+        clf.fit(X_train, y_train)
+        best_params = clf.get_params()
+        
+    y_pred = clf.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    cm = confusion_matrix(y_test, y_pred).tolist()
     
-    accuracy = clf.score(X_test, y_test)
+    plot_feature_importance(clf.feature_importances_, features)
+    plot_confusion_matrix(y_test, clf.predict(X_test), encoder.classes_)
+    
     return {
         "model": clf,
+        "encoder": encoder,
+        "features": features,
+        "df": df,
         "accuracy": accuracy,
-        "classes": encoder.classes_.tolist()
+        "confusion_matrix": cm,
+        "classes": encoder.classes_.tolist(),
+        "best_params": best_params,
+        "feature_importance": clf.feature_importances_.tolist()
     }
     
-def optimize_team(team_stats):
+def optimize_team(team_list: list[str]):
     """
     Accepts a list of Pokemon stats (dicts), averages them, and predicts usage difficulty. 
     Each dict must contain Offense, Endurance, Mobility, Scoring, and Support.
     """
-    model_data = build_model()
-    clf = model_data["model"]
-    classes = model_data["classes"]
+    data = build_model()
+    df = data["df"]
+    clf = data["model"]
+    encoder = data["encoder"]
+    features = data["features"]
     
-    # Convert list of stat dicts into a single averaged feature row
-    df = pd.DataFrame(team_stats)
-    features = ["Offense", "Endurance", "Mobility", "Scoring", "Support"]
-    
-    if not all(f in df.columns for f in features):
-        raise ValueError(f"Each team member must include the following keys: {features}")
-    
-    # Average the stats across the team
-    team_avg = df[features].mean().values.reshape(1,-1)
-    
-    # Predict usage difficulty index, then decode to label
-    pred_index = clf.predict(team_avg)[0]
-    prediction = classes[pred_index]
-    
-    return prediction
+    # Filter the dataframe to only include selected Pokémon
+    team_df = df[df["Name"].isin(team_list)]
+
+    if team_df.empty or len(team_df) != len(team_list):
+        missing = set(team_list) - set(team_df["Name"].tolist())
+        raise ValueError(f"Missing data for: {', '.join(missing)}")
+
+    # Extract features and predict
+    X_team = team_df[features]
+    predictions = clf.predict(X_team)
+    decoded_preds = encoder.inverse_transform(predictions)
+
+    # Build response
+    return [
+        {"name": name, "predicted_difficulty": diff}
+        for name, diff in zip(team_df["Name"], decoded_preds)
+    ]
         
 def get_cleaned_data():
     df, _ = load_data()
