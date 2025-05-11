@@ -21,6 +21,7 @@ def train_model():
         result = build_model(tune=True)
         return {
             "accuracy": result["accuracy"],
+            "f1_score": result["f1_score"],
             "best_params": result["best_params"],
             "confusion_matrix": result["confusion_matrix"],
             "feature_importance": dict(zip(result["features"], result["feature_importance"])),

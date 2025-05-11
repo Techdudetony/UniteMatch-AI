@@ -1,11 +1,11 @@
 import pandas as pd
 import os
-from sklearn.preprocessing import OneHotEncoder
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 FILE = os.path.join(DIRECTORY, "PokemonUniteData.csv")
 META_FILE = os.path.join(DIRECTORY, "uniteapi_metadata.csv")
 
+# Returns: base_df (raw merged), final_df (numerical + encoded)
 def load_data():
     """Loads and returns cleaned Pokemon Data"""
     base_df = pd.read_csv(FILE)
@@ -33,4 +33,4 @@ def load_data():
     # Combine numerical and encoded categorical features
     final_df = pd.concat([numeric_df, encoded_df], axis=1)
     
-    return df, final_df
+    return final_df, df

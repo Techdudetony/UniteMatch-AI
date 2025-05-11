@@ -1,11 +1,12 @@
 import os
 import pandas as pd
 from datetime import datetime
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, classification_report
 from lightgbm import LGBMClassifier
-
+from imblearn.over_sampling import SMOTE
+from collections import Counter
 from app.data.loader import load_data
 from app.visuals import (
     plot_confusion_matrix,
@@ -15,78 +16,100 @@ from app.visuals import (
 
 LOG_PATH = os.path.join(os.path.dirname(__file__), "../data/training_log.csv")
 
+# Train a LightGBM model on Pokémon Unite data and evaluate performance
 def build_model(tune: bool = False):
-    final_df, _ = load_data()
+    final_df, df = load_data()
     seed = 123845
 
-    # 🎯 Feature Engineering
-    final_df["Mobility_Offense"] = final_df["Mobility"] * final_df["Offense"]
-    final_df["Mobility_Endurance"] = final_df["Mobility"] * final_df["Endurance"]
-    final_df["Support_Scoring"] = final_df["Support"] * final_df["Scoring"]
+    # Feature Engineering
+    final_df["Mobility_Offense"] = df["Mobility"] * df["Offense"]
+    final_df["Mobility_Endurance"] = df["Mobility"] * df["Endurance"]
+    final_df["Support_Scoring"] = df["Support"] * df["Scoring"]
+    final_df["MetaImpactScore"] = df["WinRate"] * df["UsageRate"]
 
+    # Dropping low impact Columns
+    features = final_df.drop(columns=final_df.filter(regex="^(Tier_|Role_|AttackStyle_)").columns)
+    
     # Define features and target
-    features = final_df.drop(columns=["UsageDifficulty"])
     target = "UsageDifficulty"
     X = features
-    y = final_df[target]
+    y = df[target]
 
-    # 📊 Correlation heatmap
-    plot_correlation(final_df, features.columns)
+    # Correlation heatmap
+    plot_correlation(final_df, X.columns)
 
     # Encode target labels
     encoder = LabelEncoder()
     y_encoded = encoder.fit_transform(y)
 
     # Split
-    X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, random_state=seed)
+    X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, random_state=seed, stratify=y_encoded)
+    
+    # SMOTE
+    smote = SMOTE(random_state=seed)
+    X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
 
-    # 🧪 Hyperparameter tuning (optional)
+    # Hyperparameter tuning
     if tune:
         param_grid = {
-            "num_leaves": [15, 31, 63],
-            "learning_rate": [0.05, 0.1, 0.2],
-            "boosting_type": ["gbdt", "dart"],
-            "n_estimators": [100],
-            "max_depth": [5]
+            "num_leaves": [15, 31],
+            "learning_rate": [0.05, 0.1],
+            "boosting_type": ["dart"],
+            "min_child_samples": [10, 20],
+            "min_split_gain": [0.0, 0.1],
+            "n_estimators": [100, 200, 300, 500],
+            "max_depth": [3, 5, 7]
         }
-        grid = GridSearchCV(LGBMClassifier(random_state=seed), param_grid, cv=3)
-        grid.fit(X_train, y_train)
+        # StratifiedKFold
+        cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=seed)
+        grid = GridSearchCV(
+            LGBMClassifier(class_weight='balanced', random_state=seed), 
+            param_grid, 
+            cv=cv
+        )
+        grid.fit(X_train_resampled, y_train_resampled)
         clf = grid.best_estimator_
         best_params = grid.best_params_
     else:
-        clf = LGBMClassifier(n_estimators=100, max_depth=5, random_state=seed)
-        clf.fit(X_train, y_train)
+        clf = LGBMClassifier(n_estimators=100, learning_rate=0.05, max_depth=7, num_leaves=31, random_state=seed, class_weight='balanced')
+        clf.fit(X_train_resampled, y_train_resampled)
         best_params = clf.get_params()
 
-    # 🎯 Evaluate
+    # Evaluate
     y_pred = clf.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
+    f1 = f1_score(y_test, y_pred, average="weighted")
     cm = confusion_matrix(y_test, y_pred).tolist()
+    print(classification_report(y_test, y_pred, target_names=encoder.classes_))
+    print("Before SMOTE:", Counter(y_train))
+    print("After SMOTE:", Counter(y_train_resampled))
 
-    # 📊 Visuals
-    plot_feature_importance(clf.feature_importances_, features.columns)
+    # Plot Visuals
+    plot_feature_importance(clf.feature_importances_, X.columns)
     plot_confusion_matrix(y_test, y_pred, encoder.classes_)
 
-    # ✅ Log
-    log_training_result(accuracy, best_params, dict(zip(features.columns, clf.feature_importances_)))
+    # Log results
+    log_training_result(accuracy, best_params, dict(zip(X.columns, clf.feature_importances_)), f1)
 
     return {
         "model": clf,
         "encoder": encoder,
-        "features": features.columns.tolist(),
+        "features": X.columns.tolist(),
         "final_df": final_df,
         "accuracy": accuracy,
+        "f1_score": f1,
         "confusion_matrix": cm,
         "classes": encoder.classes_.tolist(),
         "best_params": best_params,
         "feature_importance": clf.feature_importances_.tolist()
     }
 
-def log_training_result(accuracy, params, feature_importance):
+def log_training_result(accuracy, params, feature_importance, f1):
     row = {
         "Run_ID": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "Model": "LightGBM",
         "Accuracy": round(accuracy, 4),
+        "F1_Score": round(f1, 4),
         "num_leaves": params.get("num_leaves", ""),
         "learning_rate": params.get("learning_rate", ""),
         "boosting_type": params.get("boosting_type", ""),
@@ -107,22 +130,44 @@ def log_training_result(accuracy, params, feature_importance):
             writer.to_csv(file, header=False, index=False)
 
 def optimize_team(team_list: list[str]):
+    """
+    Predicts usage difficulty for a list of Pokémon based on the trained model.
+
+    Args:
+        team_list (list[str]): List of Pokémon names.
+
+    Returns:
+        list[dict]: Each Pokémon's name and predicted difficulty level.
+    """
+    # Load the full dataset and encoded features
+    df, final_df = load_data()
+
+    # Build the model and get components
     data = build_model()
-    final_df = data["final_df"]
     clf = data["model"]
     encoder = data["encoder"]
     features = data["features"]
 
-    team_final_df = final_df[final_df["Name"].isin(team_list)]
-    if team_final_df.empty or len(team_final_df) != len(team_list):
-        missing = set(team_list) - set(team_final_df["Name"].tolist())
+    # Ensure matching name types
+    df["Name"] = df["Name"].astype(str)
+    team_list = [str(name) for name in team_list]
+
+    #Boolean mask for team selection
+    mask = df["Name"].isin(team_list)
+    team_df = df[mask]
+    X_team = final_df.loc[mask, features]
+
+    # Check for missing Pokémon names
+    if team_df.empty or len(team_df) != len(team_list):
+        missing = set(team_list) - set(team_df["Name"])
         raise ValueError(f"Missing data for: {', '.join(missing)}")
 
-    X_team = team_final_df[features]
+    # Make predictions
     preds = clf.predict(X_team)
     decoded = encoder.inverse_transform(preds)
 
-    return [{"name": name, "predicted_difficulty": diff} for name, diff in zip(team_final_df["Name"], decoded)]
+    # Return results
+    return [{"name": name, "predicted_difficulty": diff} for name, diff in zip(team_df["Name"], decoded)]
 
 def get_cleaned_data():
     final_df, _ = load_data()
