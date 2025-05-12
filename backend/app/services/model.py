@@ -21,12 +21,6 @@ def build_model(tune: bool = False):
     final_df, df = load_data()
     seed = 123845
 
-    # Feature Engineering
-    final_df["Mobility_Offense"] = df["Mobility"] * df["Offense"]
-    final_df["Mobility_Endurance"] = df["Mobility"] * df["Endurance"]
-    final_df["Support_Scoring"] = df["Support"] * df["Scoring"]
-    final_df["MetaImpactScore"] = df["WinRate"] * df["UsageRate"]
-
     # Dropping low impact Columns
     features = final_df.drop(columns=final_df.filter(regex="^(Tier_|Role_|AttackStyle_)").columns)
     
@@ -52,13 +46,13 @@ def build_model(tune: bool = False):
     # Hyperparameter tuning
     if tune:
         param_grid = {
-            "num_leaves": [15, 31],
+            "num_leaves": [15, 31, 64],
             "learning_rate": [0.05, 0.1],
-            "boosting_type": ["dart"],
+            "boosting_type": ["gbdt", "dart"],
             "min_child_samples": [10, 20],
             "min_split_gain": [0.0, 0.1],
-            "n_estimators": [100, 200, 300, 500],
-            "max_depth": [3, 5, 7]
+            "n_estimators": [100, 200, 300],
+            "max_depth": [5, 7]
         }
         # StratifiedKFold
         cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=seed)
@@ -140,7 +134,7 @@ def optimize_team(team_list: list[str]):
         list[dict]: Each Pokémon's name and predicted difficulty level.
     """
     # Load the full dataset and encoded features
-    df, final_df = load_data()
+    final_df, df = load_data()
 
     # Build the model and get components
     data = build_model()
@@ -170,5 +164,5 @@ def optimize_team(team_list: list[str]):
     return [{"name": name, "predicted_difficulty": diff} for name, diff in zip(team_df["Name"], decoded)]
 
 def get_cleaned_data():
-    final_df, _ = load_data()
-    return final_df.to_dict(orient="records")
+    final_df,df = load_data()
+    return df.to_dict(orient="records")

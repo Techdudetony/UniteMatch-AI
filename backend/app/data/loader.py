@@ -23,11 +23,17 @@ def load_data():
     df['BanRate'] = df['BanRate'].fillna(0)
     df['Tier'] = df['Tier'].fillna("Unknown")
     df['AttackStyle'] = df['AttackStyle'].fillna("Unknown")
+    
+    # Feature Engineering
+    df["Mobility_Offense"] = df["Mobility"] * df["Offense"]
+    df["Mobility_Endurance"] = df["Mobility"] * df["Endurance"]
+    df["Support_Scoring"] = df["Support"] * df["Scoring"]
+    df["MetaImpactScore"] = df["WinRate"] * df["UsageRate"]
 
     numeric_df = df.select_dtypes(include=['float64'])
     categorical_cols = ['Tier', 'Role', 'Ranged_or_Melee', 'AttackStyle']
     
-    # ONe-hot encode Categorical columns
+    # One-hot encode Categorical columns
     encoded_df = pd.get_dummies(df[categorical_cols], prefix=categorical_cols)
     
     # Combine numerical and encoded categorical features
