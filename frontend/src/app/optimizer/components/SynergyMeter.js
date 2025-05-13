@@ -2,14 +2,13 @@
 
 import React from "react";
 
-export default function SynergyMeter({ winRate = 0, synergy = "Balanced", message = "" }) {
-  // Dynamic color feedback based on synergy level
+export default function SynergyMeter({ winRate = 40, synergy = "Fragile", message = "Your team can’t defend against the enemy", warning = "Too many members in the Bottom lane" }) {
   const getSynergyColor = (type) => {
     switch (type) {
       case "Overcrowded":
         return "bg-red-600 text-white";
       case "Fragile":
-        return "bg-yellow-400 text-black";
+        return "bg-yellow-300 text-black border-4 border-black";
       case "Balanced":
         return "bg-green-500 text-white";
       default:
@@ -18,38 +17,36 @@ export default function SynergyMeter({ winRate = 0, synergy = "Balanced", messag
   };
 
   return (
-    <div className="flex flex-col items-center justify-center px-6 py-4 text-center">
-      {/* Win Rate Meter */}
-      <div className="relative w-36 h-36">
+    <div className="flex flex-col items-center gap-4 text-center">
+      {/* Circular Win Rate Meter */}
+      <div className="relative w-80 h-80">
         <svg className="w-full h-full" viewBox="0 0 36 36">
           <path
-            className="text-[#f08922]"
             strokeDasharray={`${winRate}, 100`}
             d="M18 2.0845
                a 15.9155 15.9155 0 0 1 0 31.831
                a 15.9155 15.9155 0 0 1 0 -31.831"
             fill="none"
-            stroke="currentColor"
+            stroke="#f08922"
             strokeWidth="2"
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-          <span className="text-sm">Win Rate</span>
-          <span className="text-3xl font-bold">{Math.round(winRate)}%</span>
+          <span className="text-4xl">Win Rate</span>
+          <span className="text-6xl font-bold">{winRate}%</span>
         </div>
       </div>
 
-      {/* Synergy Feedback */}
-      <div className={`mt-4 px-6 py-2 rounded-lg font-bold text-xl ${getSynergyColor(synergy)}`}>
+      {/* Synergy Tag */}
+      <div className={`text-3xl font-bold px-8 py-2 rounded ${getSynergyColor(synergy)}`}>
         {synergy}
       </div>
 
-      {/* Sub-message */}
-      {message && (
-        <p className="text-sm mt-2 text-white max-w-xs">
-          {message}
-        </p>
-      )}
+      {/* Feedback */}
+      <div className="text-white">
+        <p className="italic text-sm">{message}</p>
+        {warning && <p className="italic text-lg mt-1 text-yellow-300">{warning}</p>}
+      </div>
     </div>
   );
 }

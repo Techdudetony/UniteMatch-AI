@@ -1,52 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import Image from "next/image";
 
-export default function SelectedTeam() {
-  const [team, setTeam] = useState([
-    { name: "", role: "", lane: "" },
-    { name: "", role: "", lane: "" },
-    { name: "", role: "", lane: "" }
-  ]);
-
-  // Optional: Fill this from global state or props later
-  const addToTeam = (index, data) => {
-    const updated = [...team];
-    updated[index] = data;
-    setTeam(updated);
-  };
-
-  const resetSlot = (index) => {
-    const updated = [...team];
-    updated[index] = { name: "", role: "", lane: "" };
-    setTeam(updated);
-  };
-
+export default function SelectedTeam({ stackSize, selectedPokemon, lane }) {
   return (
-    <div className="bg-gradient-to-b from-orange-400 to-purple-600 rounded-xl p-4 shadow-md min-w-[300px]">
-      <h2 className="text-white text-xl font-bold mb-4 text-center">Selected Team</h2>
-      
-      {team.map((member, idx) => (
-        <div
-          key={idx}
-          className="flex justify-between items-center bg-white text-black p-3 rounded-md mb-3 shadow"
-        >
-          <div>
-            <p className="font-semibold">{member.name || "Empty Slot"}</p>
-            {member.name && (
-              <p className="text-sm text-gray-600">{member.role} – {member.lane}</p>
-            )}
-          </div>
-          {member.name && (
-            <button
-              onClick={() => resetSlot(idx)}
-              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition text-sm"
-            >
-              Reset
-            </button>
-          )}
-        </div>
-      ))}
+    <div className="w-[420px] rounded-2xl border-4 border-black p-8 bg-gradient-to-b from-orange-400 via-pink-500 to-purple-600 shadow-xl">
+      <h2 className="text-white text-3xl font-extrabold mb-4 text-center [text-shadow:_2px_2px_0_#000]">
+        Selected Team
+      </h2>
+
+      <div className="space-y-4">
+        {selectedPokemon
+          .slice(0, stackSize === "3 Stack" ? 3 : 5)
+          .map((filename, index) => {
+            // Convert "galarian-rapidash" to "Galarian Rapidash"
+            const name = filename
+              .split("-")
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ");
+
+            return (
+              <div key={index} className="flex items-center gap-4">
+                <div className="w-22 h-22 rounded-lg border-4 border-purple-500 overflow-hidden bg-gradient-to-b from-orange-600 to-purple-600">
+                  <Image
+                    src={`/pokemon/${filename}.png`}
+                    alt={name}
+                    width={56}
+                    height={56}
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+
+                <div className="text-white font-bold leading-tight text-xl [text-shadow:_1px_1px_0_#000]">
+                  <div>{name}</div>
+                  <div className="text-lg">Role / {lane} Lane</div>
+                </div>
+              </div>
+            );
+          })}
+      </div>
     </div>
   );
 }
+

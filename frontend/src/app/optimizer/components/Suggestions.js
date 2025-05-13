@@ -3,17 +3,22 @@
 import React from "react";
 
 export default function Suggestions({ suggestedPokemon = [] }) {
-  return (
-    <div className="mt-6 flex flex-col items-center">
-      <h2 className="text-white text-lg font-bold mb-4">Suggested Pokémon:</h2>
+  const isPlaceholder = suggestedPokemon.length === 0;
 
-      {/* Display suggested Pokémon as square image cards */}
-      <div className="grid grid-cols-3 gap-4">
-        {suggestedPokemon.length > 0 ? (
-          suggestedPokemon.map((pokemon, index) => (
+  return (
+    <div className="mt-6 text-center w-full">
+      <h2 className="text-white text-xl font-bold mb-2 [text-shadow:_1px_1px_0_#000]">
+        Suggestioned Pokémon:
+      </h2>
+
+      {isPlaceholder ? (
+        <p className="text-sm text-white">Add teammates to see recommendations.</p>
+      ) : (
+        <div className="flex gap-4 justify-center mt-4">
+          {suggestedPokemon.map((pokemon, index) => (
             <div
               key={index}
-              className="w-20 h-20 bg-white rounded-md shadow-md overflow-hidden hover:scale-105 transition-transform"
+              className="w-20 h-20 bg-white rounded-md shadow-md overflow-hidden hover:scale-105 transition-transform border-4 border-blue-500"
               title={pokemon.name}
             >
               <img
@@ -22,13 +27,9 @@ export default function Suggestions({ suggestedPokemon = [] }) {
                 className="w-full h-full object-cover"
               />
             </div>
-          ))
-        ) : (
-          <p className="text-sm text-gray-300 col-span-3">
-            No suggestions yet. Build a team to receive recommendations!
-          </p>
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
