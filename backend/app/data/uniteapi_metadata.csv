@@ -1,74 +1,76 @@
-﻿Name,WinRate,UsageRate,BanRate,Tier,Role,Style,AttackStyle
-Absol,50.34,25.45,5.48,A+,Speedster,Melee,Physical
-Aegislash,49.36,14.72,0.61,A,All-Rounder,Melee,Physical
-Alolan Ninetales,48.79,12.45,0.67,B+,Attacker,Ranged,Special
-Alolan Raichu,52.52,45.76,90.84,S,Attacker,Ranged,Special
-Armarouge,50.07,5.16,0.11,B,Attacker,Ranged,Special
-Azumarill,48.65,8.26,0.39,D,All-Rounder,Melee,Physical
-Blastoise,48.86,15.71,0.38,A,Defender,Ranged,Special
-Blaziken,50.17,7.23,0.28,A,All-Rounder,Melee,Physical
-Blissey,51.75,32.18,9.64,S,Support,Melee,Special
-Buzzwole,48.81,34.91,48.96,A,All-Rounder,Melee,Physical
-Ceruledge,49.54,10.2,0.71,B+,All-Rounder,Melee,Physical
-Chandelure,48.55,3.86,0.08,B,Attacker,Ranged,Special
-Charizard,48.35,7.13,0.34,B,All-Rounder,Melee,Physical
-Cinderace,47.81,14.47,0.29,B+,Attacker,Ranged,Physical
-Clefable,47.7,11.38,1.58,B,Support,Melee,Special
-Comfey,48.99,18,3.89,B+,Support,Ranged,Special
-Cramorant,48.34,4.13,0.11,B,Attacker,Ranged,Special
-Crustle,48.79,7.6,0.18,C,Defender,Melee,Physical
-Darkrai,49.19,11.74,4.69,B+,Speedster,Melee,Special
-Decidueye,49.75,24.84,0.96,C,Attacker,Ranged,Physical
-Delphox,49.15,9.9,0.19,B,Attacker,Ranged,Special
-Dodrio,51.81,8.78,0.73,B+,Speedster,Melee,Physical
-Dragapult,50,8.67,0.68,C,Attacker,Ranged,Physical
-Dragonite,48.45,7.97,0.53,C,All-Rounder,Ranged,Physical
-Duraludon,49.17,1.59,0.12,D,Attacker,Ranged,Physical
-Eldegoss,50.17,12.48,0.17,A,Support,Ranged,Special
-Espeon,47.33,16.1,0.36,B+,Attacker,Ranged,Special
-Falinks,53.01,2.84,0.2,B,All-Rounder,Melee,Physical
-Galarian Rapidash,49.36,4.88,2.66,C,Speedster,Ranged,Special
-Garchomp,49.2,5.66,0.17,B+,All-Rounder,Melee,Physical
-Gardevoir,49.21,10.58,0.28,B,Attacker,Ranged,Special
-Gengar,50.48,14,5.1,A,Speedster,Melee,Special
-Glaceon,48.47,16.06,0.7,B+,Attacker,Ranged,Special
-Goodra,47.1,6.17,0.37,C,Defender,Melee,Special
-Greedant,50.96,2.45,0.16,B,Defender,Melee,Physical
-Greninja,50.85,32.12,1.04,B,Attacker,Ranged,Physical
-Gyarados,53.47,16.06,3.57,B+,All-Rounder,Melee,Physical
-Ho-Oh,51.19,7.1,0.87,B+,Defender,Ranged,Physical
-Hoopa,50.86,14.13,2.02,A+,Support,Ranged,Special
-Inteleon,50.41,23.69,1.93,A+,Attacker,Ranged,Special
-Lapras,49.67,7.14,0.14,B,Defender,Ranged,Special
-Leafeon,48.62,18.8,4.24,A,Speedster,Melee,Physical
-Lucario,49.18,8.42,0.21,B,All-Rounder,Melee,Physical
-Machamp,50.36,9.97,0.52,B,All-Rounder,Melee,Physical
-Mamoswine,48.66,15.11,0.3,B+,Defender,Melee,Physical
-Meowscarada,52.09,16.61,2.93,A,Speedster,Melee,Physical
-Metagross,49.97,13.58,0.74,B+,All-Rounder,Melee,Physical
-Mew,49.44,6.05,0.16,A+,Attacker,Ranged,Special
-Mewtwo Y,51.28,14.81,1.32,A+,Attacker,Ranged,Special
-Mewtwo X,50.58,4.08,0.3,B,All-Rounder,Melee,Physical
-Mimikyu,49.18,12.52,2.66,A,All-Rounder,Melee,Physical
-Miraidon,48.68,4.53,0.3,A,Attacker,Ranged,Special
-Mr. Mime,49.59,5.72,0.22,C,Support,Melee,Special
-Pikachu,49.76,30.21,1.97,A,Attacker,Ranged,Special
-Psyduck,52.04,16.72,34.28,S,Support,Ranged,Special
-Sableye,46.87,7.02,1.3,B+,Support,Melee,Physical
-Scizor,48.65,17.91,2.99,B,All-Rounder,Melee,Physical
-Slowbro,49.39,19.4,0.95,A+,Defender,Ranged,Special
-Snorlax,49.96,25.21,0.56,S,Defender,Melee,Physical
-Suicune,51.45,26.9,76.44,A+,All-Rounder,Ranged,Special
-Sylveon,48.23,6.09,0.11,B,Attacker,Ranged,Special
-Talonflame,49.77,25.72,6.13,A+,Speedster,Melee,Physical
-Tinkaton,48.43,2.99,0.26,B,All-Rounder,Melee,Physical
-Trevenant,47.49,10.47,0.47,A,Defender,Melee,Physical
-Tsareena,52.71,10.29,0.52,A,All-Rounder,Melee,Physical
-Tryranitar,51.64,3.34,0.31,C,All-Rounder,Melee,Physical
-Umbreon,50.25,35.94,3.97,S,Defender,Melee,Physical
-Urshifu,52.81,6.13,0.31,A,All-Rounder,Melee,Physical
-Venusaur,48.31,19.14,1.35,B,Attacker,Ranged,Special
-Wigglytuff,49.53,8.4,0.84,B,Support,Melee,Special
-Zacian,55.44,18.48,31.14,A+,All-Rounder,Melee,Physical
-Zeraora,48.11,21.04,6.81,A+,Speedster,Melee,Physical
-Zoroark,49.93,15.21,2.87,A,Speedster,Melee,Physical
+﻿Name,WinRate,UsageRate,BanRate,Tier,Role,Style,AttackStyle,UsageDifficulty
+Absol,50.34,25.45,5.48,A+,Speedster,Melee,Physical,Expert
+Aegislash,49.36,14.72,0.61,A,All-Rounder,Melee,Physical,Expert
+Alolan Ninetales,48.79,12.45,0.67,B+,Attacker,Ranged,Special,Intermediate
+Alolan Raichu,52.52,45.76,90.84,S,Attacker,Ranged,Special,Intermediate
+Armarouge,50.07,5.16,0.11,B,Attacker,Ranged,Special,Intermediate
+Azumarill,48.65,8.26,0.39,D,All-Rounder,Melee,Physical,Intermediate
+Blastoise,48.86,15.71,0.38,A,Defender,Ranged,Special,Intermediate
+Blaziken,50.17,7.23,0.28,A,All-Rounder,Melee,Physical,Novice
+Blissey,51.75,32.18,9.64,S,Support,Melee,Special,Novice
+Buzzwole,48.81,34.91,48.96,A,All-Rounder,Melee,Physical,Intermediate
+Ceruledge,49.54,10.2,0.71,B+,All-Rounder,Melee,Physical,Intermediate
+Chandelure,48.55,3.86,0.08,B,Attacker,Ranged,Special,Novice
+Charizard,48.35,7.13,0.34,B,All-Rounder,Melee,Physical,Novice
+Cinderace,47.81,14.47,0.29,B+,Attacker,Ranged,Physical,Novice
+Clefable,47.7,11.38,1.58,B,Support,Melee,Special,Novice
+Comfey,48.99,18,3.89,B+,Support,Ranged,Special,Novice
+Cramorant,48.34,4.13,0.11,B,Attacker,Ranged,Special,Expert
+Crustle,48.79,7.6,0.18,C,Defender,Melee,Physical,Novice
+Darkrai,49.19,11.74,4.69,B+,Speedster,Melee,Special,Expert
+Decidueye,49.75,24.84,0.96,C,Attacker,Ranged,Physical,Intermediate
+Delphox,49.15,9.9,0.19,B,Attacker,Ranged,Special,Intermediate
+Dodrio,51.81,8.78,0.73,B+,Speedster,Melee,Physical,Expert
+Dragapult,50,8.67,0.68,C,Attacker,Ranged,Physical,Intermediate
+Dragonite,48.45,7.97,0.53,C,All-Rounder,Ranged,Physical,Novice
+Duraludon,49.17,1.59,0.12,D,Attacker,Ranged,Physical,Intermediate
+Eldegoss,50.17,12.48,0.17,A,Support,Ranged,Special,Novice
+Espeon,47.33,16.1,0.36,B+,Attacker,Ranged,Special,Intermediate
+Falinks,53.01,2.84,0.2,B,All-Rounder,Melee,Physical,Expert
+Galarian Rapidash,49.36,4.88,2.66,C,Speedster,Ranged,Special,Intermediate
+Garchomp,49.2,5.66,0.17,B+,All-Rounder,Melee,Physical,Intermediate
+Gardevoir,49.21,10.58,0.28,B,Attacker,Ranged,Special,Intermediate
+Gengar,50.48,14,5.1,A,Speedster,Melee,Special,Expert
+Glaceon,48.47,16.06,0.7,B+,Attacker,Ranged,Special,Intermediate
+Goodra,47.1,6.17,0.37,C,Defender,Melee,Special,Intermediate
+Greedant,50.96,2.45,0.16,B,Defender,Melee,Physical,Expert
+Greninja,50.85,32.12,1.04,B,Attacker,Ranged,Physical,Expert
+Gyarados,53.47,16.06,3.57,B+,All-Rounder,Melee,Physical,Intermediate
+Ho-Oh,51.19,7.1,0.87,B+,Defender,Ranged,Physical,Novice
+Hoopa,50.86,14.13,2.02,A+,Support,Ranged,Special,Expert
+Inteleon,50.41,23.69,1.93,A+,Attacker,Ranged,Special,Intermediate
+Lapras,49.67,7.14,0.14,B,Defender,Ranged,Special,Intermediate
+Leafeon,48.62,18.8,4.24,A,Speedster,Melee,Physical,Intermediate
+Lucario,49.18,8.42,0.21,B,All-Rounder,Melee,Physical,Expert
+Machamp,50.36,9.97,0.52,B,All-Rounder,Melee,Physical,Intermediate
+Mamoswine,48.66,15.11,0.3,B+,Defender,Melee,Physical,Intermediate
+Meowscarada,52.09,16.61,2.93,A,Speedster,Melee,Physical,Intermediate
+Metagross,49.97,13.58,0.74,B+,All-Rounder,Melee,Physical,Intermediate
+Mew,49.44,6.05,0.16,A+,Attacker,Ranged,Special,Novice
+Mewtwo Y,51.28,14.81,1.32,A+,Attacker,Ranged,Special,Novice
+Mewtwo X,50.58,4.08,0.3,B,All-Rounder,Melee,Physical,Novice
+Mewtwo,50.58,4.08,0.3,B,Attacker,Ranged,Physical,Novice
+Mimikyu,49.18,12.52,2.66,A,All-Rounder,Melee,Physical,Intermediate
+Miraidon,48.68,4.53,0.3,A,Attacker,Ranged,Special,Expert
+Mr. Mime,49.59,5.72,0.22,C,Support,Melee,Special,Intermediate
+Pikachu,49.76,30.21,1.97,A,Attacker,Ranged,Special,Novice
+Psyduck,52.04,16.72,34.28,S,Support,Ranged,Special,Novice
+Sableye,46.87,7.02,1.3,B+,Support,Melee,Physical,Intermediate
+Scizor,48.65,17.91,2.99,B,All-Rounder,Melee,Physical,Intermediate
+Slowbro,49.39,19.4,0.95,A+,Defender,Ranged,Special,Intermediate
+Snorlax,49.96,25.21,0.56,S,Defender,Melee,Physical,Novice
+Suicune,51.45,26.9,76.44,A+,All-Rounder,Ranged,Special,Intermediate
+Sylveon,48.23,6.09,0.11,B,Attacker,Ranged,Special,Intermediate
+Talonflame,49.77,25.72,6.13,A+,Speedster,Melee,Physical,Novice
+Tinkaton,48.43,2.99,0.26,B,All-Rounder,Melee,Physical,Novice
+Trevenant,47.49,10.47,0.47,A,Defender,Melee,Physical,Intermediate
+Tsareena,52.71,10.29,0.52,A,All-Rounder,Melee,Physical,Expert
+Tryranitar,51.64,3.34,0.31,C,All-Rounder,Melee,Physical,Intermediate
+Umbreon,50.25,35.94,3.97,S,Defender,Melee,Physical,Novice
+Urshifu RapidStrike,52.81,6.13,0.31,A,All-Rounder,Melee,Physical,Intermediate
+Urshifu SingleStrike,52.81,6.13,0.31,A,All-Rounder,Melee,Physical,Intermediate
+Venusaur,48.31,19.14,1.35,B,Attacker,Ranged,Special,Intermediate
+Wigglytuff,49.53,8.4,0.84,B,Support,Melee,Special,Intermediate
+Zacian,55.44,18.48,31.14,A+,All-Rounder,Melee,Physical,Intermediate
+Zeraora,48.11,21.04,6.81,A+,Speedster,Melee,Physical,Expert
+Zoroark,49.93,15.21,2.87,A,Speedster,Melee,Physical,Expert

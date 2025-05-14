@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useOptimizer } from "@/context/OptimizerContext";
-import { fetchTeamOptimization } from "@/app/utils/api";
 
 const roles = ["Attacker", "Defender", "Speedster", "Support", "All-Rounder"];
 const lanes = ["Top", "Jungle", "Bottom"];

@@ -6,10 +6,6 @@ import { useOptimizer } from "@/context/OptimizerContext";
 export default function SelectedTeam() {
   const { selectedPokemon, stackSize, lane, predictedDifficulties, isLoading } = useOptimizer();
 
-  // Debug logs
-  console.log("Selected Pokémon:", selectedPokemon);
-  console.log("Predicted Difficulties:", predictedDifficulties);
-
   return (
     <div className="w-[420px] rounded-2xl border-4 border-black p-8 bg-gradient-to-b from-orange-400 via-pink-500 to-purple-600 shadow-xl">
       <h2 className="text-white text-3xl font-extrabold mb-4 text-center [text-shadow:_2px_2px_0_#000]">

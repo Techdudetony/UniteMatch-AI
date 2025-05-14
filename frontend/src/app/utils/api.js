@@ -13,17 +13,12 @@ export async function fetchTeamOptimization(team) {
             .join(" ")
     );
 
-    console.log("Sending to /optimize-team:", formattedTeam); // DEBUGGING
-
     const res = await fetch(`${BASE_URL}/optimize-team`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ team: formattedTeam }),
     });
-    const json = await res.json();
-    console.log("Response from /optimize-team:", json);
-
-    return json;
+    return await res.json();
 }
 
 export async function fetchTrainModel() {

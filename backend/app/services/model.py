@@ -16,6 +16,10 @@ from app.visuals import (
 
 LOG_PATH = os.path.join(os.path.dirname(__file__), "../data/training_log.csv")
 
+# Normalizes names in data
+def normalize_name(name):
+    return ' '.join(word.capitalize() for word in name.replace("-", " ").split())
+
 # Train a LightGBM model on Pokémon Unite data and evaluate performance
 def build_model(tune: bool = False):
     final_df, df = load_data()
@@ -144,7 +148,7 @@ def optimize_team(team_list: list[str]):
 
     # Ensure matching name types
     df["Name"] = df["Name"].astype(str)
-    team_list = [str(name) for name in team_list]
+    team_list = [normalize_name(name) for name in team_list]
 
     #Boolean mask for team selection
     mask = df["Name"].isin(team_list)
