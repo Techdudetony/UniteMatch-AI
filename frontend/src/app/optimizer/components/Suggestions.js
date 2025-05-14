@@ -1,9 +1,12 @@
 "use client";
 
 import React from "react";
+import { useOptimizer } from "@/context/OptimizerContext";
 
-export default function Suggestions({ suggestedPokemon = [] }) {
-  const isPlaceholder = suggestedPokemon.length === 0;
+export default function Suggestions() {
+  const { predictedDifficulties } = useOptimizer();
+
+  const isPlaceholder = (predictedDifficulties ?? []).length === 0;
 
   return (
     <div className="mt-6 text-center w-full">
@@ -15,7 +18,7 @@ export default function Suggestions({ suggestedPokemon = [] }) {
         <p className="text-sm text-white">Add teammates to see recommendations.</p>
       ) : (
         <div className="flex gap-4 justify-center mt-4">
-          {suggestedPokemon.map((pokemon, index) => (
+          {predictedDifficulties.map((pokemon, index) => (
             <div
               key={index}
               className="w-20 h-20 bg-white rounded-md shadow-md overflow-hidden hover:scale-105 transition-transform border-4 border-blue-500"

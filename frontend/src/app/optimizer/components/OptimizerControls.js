@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useOptimizer } from "@/context/OptimizerContext";
+import { fetchTeamOptimization } from "@/app/utils/api";
 
 const roles = ["Attacker", "Defender", "Speedster", "Support", "All-Rounder"];
 const lanes = ["Top", "Jungle", "Bottom"];
@@ -11,14 +13,15 @@ const pokemonList = [
   "lucario"
 ];
 
-export default function OptimizerControls({
-  stackSize, setStackSize,
-  selectedPokemon, setSelectedPokemon,
-  role, setRole,
-  lane, setLane
-}) {
-  const [search, setSearch] = useState("");
+export default function OptimizerControls() {
+  const {
+    selectedPokemon, setSelectedPokemon,
+    stackSize, setStackSize,
+    role, setRole,
+    lane, setLane,
+  } = useOptimizer();
 
+  const [search, setSearch] = useState("");
   const limit = stackSize === "3 Stack" ? 3 : 5;
 
   const filteredPokemon = pokemonList.filter(p =>

@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import StickyNav from "./components/StickyNav"; 
+import StickyNav from "./components/StickyNav";
+import { OptimizerProvider } from "@/context/OptimizerContext"; 
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,9 +21,13 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#480ad8] text-white`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#480ad8] text-white`}
+      >
         <StickyNav />
-        <main>{children}</main>
+        <OptimizerProvider>
+          <main>{children}</main>
+        </OptimizerProvider>
       </body>
     </html>
   );

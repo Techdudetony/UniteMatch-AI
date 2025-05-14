@@ -9,6 +9,7 @@ class TeamRequest(BaseModel):
     
 @router.post("/optimize-team")
 def optimize(request: TeamRequest):
+    print("Received Team for Optimization:", request.team) # DEBUGGING
     try:
         result = optimize_team(request.team)
         return {"optimized": result}
