@@ -26,6 +26,22 @@ def load_data():
     # Merge on normalized names
     merged_df = meta_df.merge(base_df_cleaned, on="Name", how="left")
     
+    # Feedback Data Aggregate
+    FEEDBACK_FILE = os.path.join(DIRECTORY, "user_feedback.csv")
+    if os.path.exists(FEEDBACK_FILE):
+        feedback_df = pd.read_csv(FEEDBACK_FILE)
+        feedback_agg = (
+            feedback_df.groupby("Name")[["Win", "Loss"]].sum().reset_index()
+        )
+        feedback_agg["AdjustedWinRate"] = (
+            feedback_agg["Win"] / (feedback_agg["Win"] + feedback_agg["Loss"])
+        ).fillna(0).round(2)
+
+        merged_df = pd.merge(merged_df, feedback_agg, on="Name", how="left")
+        merged_df["AdjustedWinRate"] = merged_df["AdjustedWinRate"].fillna(merged_df["WinRate"])
+    else:
+        merged_df["AdjustedWinRate"] = merged_df["WinRate"]
+    
     # Drop unnecessary description column
     merged_df.drop(columns=["Description"], inplace=True)
 
@@ -45,7 +61,7 @@ def load_data():
     merged_df["Mobility_Offense"] = (merged_df["Mobility"] * merged_df["Offense"]).round(2)
     merged_df["Mobility_Endurance"] = (merged_df["Mobility"] * merged_df["Endurance"]).round(2)
     merged_df["Support_Scoring"] = (merged_df["Support"] * merged_df["Scoring"]).round(2)
-    merged_df["MetaImpactScore"] = (merged_df["WinRate"] * merged_df["UsageRate"]).round(2)
+    merged_df["MetaImpactScore"] = (merged_df["AdjustedWinRate"] * merged_df["UsageRate"]).round(2)
     
     # Sort data by "Name"
     merged_df.sort_values("Name", inplace=True)

@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routes import data, optimize
+from .data import feedback
 
 app = FastAPI()
 
@@ -15,3 +16,4 @@ app.add_middleware(
 # Route files
 app.include_router(data.router)
 app.include_router(optimize.router)
+app.include_router(feedback.router)
