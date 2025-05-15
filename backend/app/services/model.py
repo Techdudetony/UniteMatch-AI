@@ -168,5 +168,5 @@ def optimize_team(team_list: list[str]):
     return [{"name": name, "predicted_difficulty": diff} for name, diff in zip(team_df["Name"], decoded)]
 
 def get_cleaned_data():
-    final_df,df = load_data()
-    return df.to_dict(orient="records")
+    _, merged_df = load_data()
+    return merged_df.to_dict(orient="records")

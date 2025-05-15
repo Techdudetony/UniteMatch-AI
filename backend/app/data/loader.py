@@ -54,6 +54,10 @@ def load_data():
     # Fill missing metadata columns with Average
     average_columns = ["Offense", "Endurance", "Mobility", "Scoring", "Support"]
     
+    # Fill missing Win / Loss with 0
+    merged_df["Win"] = merged_df["Win"].fillna(0).astype(int)
+    merged_df["Loss"] = merged_df["Loss"].fillna(0).astype(int)
+    
     for col in average_columns:
         merged_df[col] = merged_df[col].fillna(merged_df[col].mean()).round(1)
 

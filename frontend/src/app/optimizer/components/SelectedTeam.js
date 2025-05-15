@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useOptimizer } from "@/context/OptimizerContext";
 
 export default function SelectedTeam() {
-  const { selectedPokemon, stackSize, lane, predictedDifficulties, isLoading, pokemonData } = useOptimizer();
+  const { selectedPokemon, setSelectedPokemon, stackSize, lane, predictedDifficulties, isLoading, pokemonData } = useOptimizer();
   const [renderedTeam, setRenderedTeam] = useState([]);
   const prevLength = useRef(0);
 
@@ -36,7 +36,42 @@ export default function SelectedTeam() {
     prevLength.current = selectedPokemon.length;
   }, [selectedPokemon]);
 
+  const handleExport = () => {
+    const exportData = renderedTeam.map((entry) => {
+      const displayName = entry.displayName;
+      const match = predictedDifficulties?.find(
+        (p) =>
+          p.name.toLowerCase().replace(/[^a-z0-9]/gi, "") ===
+          displayName.toLowerCase().replace(/[^a-z0-9]/gi, "")
+      );
+
+      const info = pokemonData.find(
+        (p) =>
+          p.Name.toLowerCase().replace(/[^a-z0-9]/gi, "") ===
+          displayName.toLowerCase().replace(/[^a-z0-9]/gi, "")
+      );
+
+      return {
+        name: displayName,
+        role: info?.Role || "Unknown",
+        lane,
+        predicted_difficulty: match?.predicted_difficulty ?? "?",
+      };
+    });
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "UniteMatch_Team.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
+    // Selected Team Box
     <div className="w-[450px] rounded-2xl border-4 border-black p-8 bg-gradient-to-b from-orange-400 via-pink-500 to-purple-600 shadow-xl">
       <h2 className="text-white text-3xl font-extrabold mb-4 text-center [text-shadow:_2px_2px_0_#000]">
         Selected Team
@@ -50,7 +85,7 @@ export default function SelectedTeam() {
               .split("-")
               .map(word => word.charAt(0).toUpperCase() + word.slice(1))
               .join(" ");
-            
+
             const match = predictedDifficulties?.find(
               (p) =>
                 p.name.toLowerCase().replace(/[^a-z0-9]/gi, "") ===
@@ -60,7 +95,7 @@ export default function SelectedTeam() {
             const pokemonInfo = pokemonData.find(
               (p) =>
                 p.Name.toLowerCase().replace(/[^a-z0-9]/gi, "") ===
-              displayName.toLowerCase().replace(/[^a-z0-9]/gi, "")
+                displayName.toLowerCase().replace(/[^a-z0-9]/gi, "")
             );
 
             const role = pokemonInfo?.Role || "Unknown"
@@ -91,6 +126,26 @@ export default function SelectedTeam() {
             );
           })}
       </div>
-    </div>
+
+      {/* Buttons */}
+      <div className="flex justify-end gap-4 mt-6">
+        <button
+          onClick={handleExport}
+          disabled={selectedPokemon.length === 0}
+          className={`${selectedPokemon.length === 0 ? 'opacity-50 cursor-not-allowed' : ''
+            } bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-xl shadow-md transition`}
+        >
+          Export
+        </button>
+        <button
+          onClick={() => setSelectedPokemon([])}
+          disabled={selectedPokemon.length === 0}
+          className={`${selectedPokemon.length === 0 ? 'opacity-50 cursor-not-allowed' : ''
+            } bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-xl shadow-md transition`}
+        >
+          Reset
+        </button>
+      </div>
+    </div >
   );
 }
