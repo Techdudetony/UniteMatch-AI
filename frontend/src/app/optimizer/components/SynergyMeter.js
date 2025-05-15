@@ -1,8 +1,12 @@
 "use client";
 
 import React from "react";
+import { useOptimizer } from "@/context/OptimizerContext";
 
-export default function SynergyMeter({ winRate = 40, synergy = "Fragile", message = "Your team can’t defend against the enemy", warning = "Too many members in the Bottom lane" }) {
+export default function SynergyMeter() {
+  const { getSynergySummary } = useOptimizer();
+  const { winRate = 0, synergy = "Unknown", message = "", warning = "" } = getSynergySummary();
+
   const getSynergyColor = (type) => {
     switch (type) {
       case "Overcrowded":
@@ -33,7 +37,7 @@ export default function SynergyMeter({ winRate = 40, synergy = "Fragile", messag
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
           <span className="text-4xl">Win Rate</span>
-          <span className="text-6xl font-bold">{winRate}%</span>
+          <span className="text-6xl font-bold">{isNaN(winRate) ? "?" : `${winRate}%`}</span>
         </div>
       </div>
 

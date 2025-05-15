@@ -52,7 +52,7 @@ export default function OptimizerPage() {
 
       {/* Center Column */}
       <div className="flex items-center justify-center">
-        <SynergyMeter winRate={40} synergy="Balanced" message="" />
+        <SynergyMeter />
       </div>
 
       {/* Right Column */}
