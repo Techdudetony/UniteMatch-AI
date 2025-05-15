@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useOptimizer } from "@/context/OptimizerContext";
 
 export default function SelectedTeam() {
-  const { selectedPokemon, stackSize, lane, predictedDifficulties, isLoading } = useOptimizer();
+  const { selectedPokemon, stackSize, lane, predictedDifficulties, isLoading, pokemonData } = useOptimizer();
   const [renderedTeam, setRenderedTeam] = useState([]);
   const prevLength = useRef(0);
 
@@ -37,7 +37,7 @@ export default function SelectedTeam() {
   }, [selectedPokemon]);
 
   return (
-    <div className="w-[420px] rounded-2xl border-4 border-black p-8 bg-gradient-to-b from-orange-400 via-pink-500 to-purple-600 shadow-xl">
+    <div className="w-[450px] rounded-2xl border-4 border-black p-8 bg-gradient-to-b from-orange-400 via-pink-500 to-purple-600 shadow-xl">
       <h2 className="text-white text-3xl font-extrabold mb-4 text-center [text-shadow:_2px_2px_0_#000]">
         Selected Team
       </h2>
@@ -45,12 +45,25 @@ export default function SelectedTeam() {
       <div className="space-y-4">
         {renderedTeam
           .slice(0, stackSize === "3 Stack" ? 3 : 5)
-          .map(({ filename, displayName }) => {
+          .map(({ filename }) => {
+            const displayName = filename
+              .split("-")
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ");
+            
             const match = predictedDifficulties?.find(
               (p) =>
                 p.name.toLowerCase().replace(/[^a-z0-9]/gi, "") ===
                 displayName.toLowerCase().replace(/[^a-z0-9]/gi, "")
             );
+
+            const pokemonInfo = pokemonData.find(
+              (p) =>
+                p.Name.toLowerCase().replace(/[^a-z0-9]/gi, "") ===
+              displayName.toLowerCase().replace(/[^a-z0-9]/gi, "")
+            );
+
+            const role = pokemonInfo?.Role || "Unknown"
 
             return (
               <div key={filename} className="flex items-center gap-4">
@@ -66,7 +79,7 @@ export default function SelectedTeam() {
 
                 <div className="text-white font-bold leading-tight text-xl [text-shadow:_1px_1px_0_#000]">
                   <div>{displayName}</div>
-                  <div className="text-lg">Role / {lane} Lane</div>
+                  <div className="text-lg">Role: {role} / {lane} Lane</div>
                   <div className="text-lg">
                     Difficulty:{" "}
                     {isLoading || !match
