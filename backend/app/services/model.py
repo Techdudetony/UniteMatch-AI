@@ -174,40 +174,90 @@ def get_cleaned_data():
 
 def predict_synergy_winrate(team_list: list[str]):
     """
-    Predicts estimated win rate for a given team using regression on synergy-related features.
+    Predicts estimated win rate for a given team using synergy-related features 
+    from both individual and team-level stats.
     """
+    from sklearn.ensemble import RandomForestRegressor
+
+    # Load full dataset
     final_df, df = load_data()
 
-    # Normalize names
+    # Normalize and filter selected team
     team_list = [normalize_name(name) for name in team_list]
+    df["Name"] = df["Name"].astype(str)
     mask = df["Name"].isin(team_list)
     team_df = df[mask]
-    X_team = final_df.loc[mask]
+    X_team = final_df[mask]
 
     if team_df.empty or len(team_df) != len(team_list):
         missing = set(team_list) - set(team_df["Name"])
         raise ValueError(f"Missing data for: {', '.join(missing)}")
 
-    # Define synergy-related features
-    synergy_features = [
+    # Features to use
+    synergy_individual_features = [
         "AvgDifficulty", "FeedbackBoostedWinRate", "MetaImpactScore",
         "Mobility_Offense", "Mobility_Endurance", "Support_Scoring"
-    ] + [col for col in final_df.columns if col.startswith("Role_") or col.startswith("Lane_")]
+    ]
+    synergy_categorical_features = [
+        col for col in final_df.columns if col.startswith("Role_") or col.startswith("Lane_")
+    ]
+    synergy_team_features = [
+        "num_unique_roles", "most_common_role_count", "has_support",
+        "num_unique_lanes", "has_jungle", "avg_difficulty",
+        "avg_winrate", "synergy_variance"
+    ]
+    synergy_features = synergy_individual_features + synergy_team_features + synergy_categorical_features
 
-    X = final_df[synergy_features]
-    y = final_df["AdjustedWinRate"]
+    # Compute synergy features for full dataset (simulate grouping by team of 1)
+    all_synergy = []
+    for i in range(len(final_df)):
+        row = df.iloc[i:i+1]
+        indiv = final_df.iloc[i:i+1][synergy_individual_features + synergy_categorical_features]
+        team_feats = compute_synergy_features(row)
+        merged = pd.concat([indiv.reset_index(drop=True), team_feats.reset_index(drop=True)], axis=1)
+        all_synergy.append(merged)
+
+    training_df = pd.concat(all_synergy, axis=0)
+    X = training_df[synergy_features]
+    y = df["AdjustedWinRate"]
 
     # Train regressor
     model = RandomForestRegressor(n_estimators=100, random_state=42)
     model.fit(X, y)
 
-    # Predict team win rate by averaging predictions
-    X_input = X_team[synergy_features]
+    # Compute team input features
+    team_indiv = X_team[synergy_individual_features + synergy_categorical_features]
+    team_avg = team_indiv.mean().to_frame().T.reset_index(drop=True)
+    synergy_df = compute_synergy_features(team_df)
+    X_input = pd.concat([team_avg, synergy_df], axis=1)[synergy_features]
+
+    # Predict
     team_preds = model.predict(X_input)
-    avg_win_rate = round(team_preds.mean() * 100, 2)  # percentage format
+    avg_win_rate = round(team_preds.mean() * 100, 2)
 
     return {
         "team": team_list,
         "estimated_win_rate": avg_win_rate,
         "individual_rates": [round(p * 100, 2) for p in team_preds]
     }
+    
+def compute_synergy_features(team_df: pd.DataFrame) -> pd.DataFrame:
+    features = {}
+
+    # Role diversity
+    role_counts = team_df["Role"].value_counts()
+    features["num_unique_roles"] = len(role_counts)
+    features["most_common_role_count"] = role_counts.max()
+    features["has_support"] = int("Support" in team_df["Role"].values)
+
+    # Lane coverage
+    lane_counts = team_df["PreferredLane"].value_counts()
+    features["num_unique_lanes"] = len(lane_counts)
+    features["has_jungle"] = int("Jungle" in team_df["PreferredLane"].values)
+
+    # Composition averages
+    features["avg_difficulty"] = team_df["AvgDifficulty"].mean()
+    features["avg_winrate"] = team_df["AdjustedWinRate"].mean()
+    features["synergy_variance"] = team_df[["Offense", "Support", "Mobility", "Endurance"]].var().mean()
+
+    return pd.DataFrame([features])
