@@ -21,6 +21,17 @@ export function OptimizerProvider({ children }) {
             .catch(console.error);
     }, []);
 
+    function refreshPokemonData() {
+        fetch("http://127.0.0.1:8000/data-preview")
+            .then(res => res.json())
+            .then(setPokemonData)
+            .catch(console.error);
+    }
+
+    useEffect(() => {
+        refreshPokemonData();
+    }, []);
+
     function submitFeedback(result) {
         if (selectedPokemon.length === 0) {
             return Promise.reject("No team selected");
@@ -103,6 +114,7 @@ export function OptimizerProvider({ children }) {
                 predictedDifficulties, setPredictedDifficulties,
                 isLoading, setIsLoading,
                 pokemonData,
+                refreshPokemonData,
                 submitFeedback,
                 getSynergySummary
             }}

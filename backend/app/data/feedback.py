@@ -18,7 +18,7 @@ def submit_feedback(data: FeedbackInput):
 
     for name in data.team:
         result_row = {
-            "Name": name,
+            "Name": name.title(),
             "Win": 1 if data.result == "win" else 0,
             "Loss": 1 if data.result == "loss" else 0,
             "Timestamp": data.timestamp

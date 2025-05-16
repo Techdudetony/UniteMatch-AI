@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import Image from "next/image";
 
 export default function FeedbackModal({ visible, onClose, team = [] }) {
-    const { submitFeedback } = useOptimizer();
+    const { submitFeedback, refreshPokemonData } = useOptimizer();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
 
@@ -17,13 +17,23 @@ export default function FeedbackModal({ visible, onClose, team = [] }) {
         setError(null);
         try {
             await submitFeedback(result);
+            refreshPokemonData();
             onClose();
 
             // Toast message
             if (result === "win") {
-                toast.success("🎉 Congrats on your victory!");
+                toast.success("🎉 Victory! Great Teamwork out there!", {
+                    style: {
+                        fontWeight: "bold",
+                        fontSize: "16px"
+                    }
+                });
             } else if (result === "loss") {
-                toast("💪 You'll get them next time!", {
+                toast("💪 Tough Loss - Keep training, Trainer!", {
+                    style: {
+                        fontWeight: "bold",
+                        fontSize: "16px"
+                    },
                     icon: "😤",
                     duration: 4000,
                 });

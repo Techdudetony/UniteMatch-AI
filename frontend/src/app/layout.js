@@ -34,7 +34,7 @@ export default function RootLayout({ children }) {
               duration: 5000,
               style: {
                 background: "#333",
-                color: "#ff",
+                color: "#fff",
                 borderRadius: "12px",
                 padding: "14px",
               },
