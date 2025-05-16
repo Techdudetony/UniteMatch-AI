@@ -1,7 +1,7 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
-import { submitUserFeedback } from "@/app/utils/api";
+import { createContext, useContext, useEffect, useState, useMemo } from "react";
+import { submitUserFeedback, fetchSynergyWinrate } from "@/app/utils/api";
 
 const OptimizerContext = createContext();
 
@@ -13,7 +13,9 @@ export function OptimizerProvider({ children }) {
     const [predictedDifficulties, setPredictedDifficulties] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [pokemonData, setPokemonData] = useState([]);
+    const [synergy, setSynergy] = useState({ winRate: 0, individualRates: [] });
 
+    // Fetch metadata
     useEffect(() => {
         fetch("http://127.0.0.1:8000/data-preview")
             .then(res => res.json())
@@ -27,10 +29,6 @@ export function OptimizerProvider({ children }) {
             .then(setPokemonData)
             .catch(console.error);
     }
-
-    useEffect(() => {
-        refreshPokemonData();
-    }, []);
 
     function submitFeedback(result) {
         if (selectedPokemon.length === 0) {
@@ -104,6 +102,29 @@ export function OptimizerProvider({ children }) {
         };
     }
 
+    // Auto-fetch synergy prediction when team changes
+    useEffect(() => {
+        if (selectedPokemon.length === 0) {
+            setSynergy({ winRate: 0, individualRates: [] });
+            return;
+        }
+
+        const fetchSynergy = async () => {
+            try {
+                const result = await fetchSynergyWinrate(selectedPokemon);
+                setSynergy({
+                    winRate: result.estimated_win_rate,
+                    individualRates: result.individual_rates
+                });
+            } catch (err) {
+                console.error("Failed to fetch synergy:", err);
+                setSynergy({ winRate: 0, individualRates: [] });
+            }
+        };
+
+        fetchSynergy();
+    }, [selectedPokemon]);
+
     return (
         <OptimizerContext.Provider
             value={{
@@ -116,7 +137,8 @@ export function OptimizerProvider({ children }) {
                 pokemonData,
                 refreshPokemonData,
                 submitFeedback,
-                getSynergySummary
+                getSynergySummary,
+                synergy,
             }}
         >
             {children}

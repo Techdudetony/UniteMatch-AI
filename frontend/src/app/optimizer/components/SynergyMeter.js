@@ -4,8 +4,22 @@ import React from "react";
 import { useOptimizer } from "@/context/OptimizerContext";
 
 export default function SynergyMeter() {
-  const { getSynergySummary } = useOptimizer();
-  const { winRate = 0, synergy = "Unknown", message = "", warning = "" } = getSynergySummary();
+  const { synergy } = useOptimizer();
+  const winRate = synergy?.winRate ?? 0;
+
+  // Interpret synergy label
+  let synergyLabel = "Unknown";
+  let message = "";
+
+  if (winRate < 35) {
+    synergyLabel = "Fragile";
+    message = "Your team might struggle to hold objectives.";
+  } else if (winRate > 60) {
+    synergyLabel = "Overcrowded";
+    message = "Too many damage dealers — consider adding support.";
+  } else {
+    synergyLabel = "Balanced";
+  }
 
   const getSynergyColor = (type) => {
     switch (type) {
@@ -42,15 +56,14 @@ export default function SynergyMeter() {
       </div>
 
       {/* Synergy Tag */}
-      <div className={`text-3xl font-bold px-8 py-2 rounded ${getSynergyColor(synergy)}`}>
-        {synergy}
+      <div className={`text-3xl font-bold px-8 py-2 rounded ${getSynergyColor(synergyLabel)}`}>
+        {synergyLabel}
       </div>
 
-      {/* Feedback */}
-      <div className="text-white">
-        <p className="italic text-sm">{message}</p>
-        {warning && <p className="italic text-lg mt-1 text-yellow-300">{warning}</p>}
-      </div>
+      {/* Message */}
+      {message && (
+        <p className="italic text-sm text-white mt-2 max-w-[300px]">{message}</p>
+      )}
     </div>
   );
 }

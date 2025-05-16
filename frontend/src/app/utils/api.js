@@ -6,7 +6,7 @@ export async function fetchDataPreview() {
 }
 
 export async function fetchTeamOptimization(team) {
-    const formattedTeam = team.map(({name}) =>
+    const formattedTeam = team.map(({ name }) =>
         name
             .split("-")
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -34,5 +34,22 @@ export async function submitUserFeedback(feedbackPayload) {
     });
 
     if (!res.ok) throw new Error("Feedback submission failed");
+    return await res.json();
+}
+
+export async function fetchSynergyWinrate(team) {
+    const formattedTeam = team.map(p =>
+        p.name
+            .split("-")
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ")
+    );
+
+    const res = await fetch(`${BASE_URL}/synergy-winrate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ team: formattedTeam })
+    });
+
     return await res.json();
 }
