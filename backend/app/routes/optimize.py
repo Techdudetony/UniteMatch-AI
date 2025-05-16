@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from app.services.model import optimize_team, build_model
+from app.services.model import optimize_team, build_model, predict_synergy_winrate
 
 router = APIRouter()
 
@@ -30,3 +30,10 @@ def train_model():
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@router.post("/synergy-winrate")
+def get_synergy_winrate(data: TeamRequest):
+    try:
+        return predict_synergy_winrate(data.team)
+    except Exception as e:
+        return {"error": str(e)}

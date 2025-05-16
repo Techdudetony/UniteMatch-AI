@@ -4,6 +4,7 @@ from datetime import datetime
 from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, classification_report
+from sklearn.ensemble import RandomForestRegressor
 from lightgbm import LGBMClassifier
 from imblearn.over_sampling import SMOTE
 from collections import Counter
@@ -170,3 +171,43 @@ def optimize_team(team_list: list[str]):
 def get_cleaned_data():
     _, merged_df = load_data()
     return merged_df.to_dict(orient="records")
+
+def predict_synergy_winrate(team_list: list[str]):
+    """
+    Predicts estimated win rate for a given team using regression on synergy-related features.
+    """
+    final_df, df = load_data()
+
+    # Normalize names
+    team_list = [normalize_name(name) for name in team_list]
+    mask = df["Name"].isin(team_list)
+    team_df = df[mask]
+    X_team = final_df.loc[mask]
+
+    if team_df.empty or len(team_df) != len(team_list):
+        missing = set(team_list) - set(team_df["Name"])
+        raise ValueError(f"Missing data for: {', '.join(missing)}")
+
+    # Define synergy-related features
+    synergy_features = [
+        "AvgDifficulty", "FeedbackBoostedWinRate", "MetaImpactScore",
+        "Mobility_Offense", "Mobility_Endurance", "Support_Scoring"
+    ] + [col for col in final_df.columns if col.startswith("Role_") or col.startswith("Lane_")]
+
+    X = final_df[synergy_features]
+    y = final_df["AdjustedWinRate"]
+
+    # Train regressor
+    model = RandomForestRegressor(n_estimators=100, random_state=42)
+    model.fit(X, y)
+
+    # Predict team win rate by averaging predictions
+    X_input = X_team[synergy_features]
+    team_preds = model.predict(X_input)
+    avg_win_rate = round(team_preds.mean() * 100, 2)  # percentage format
+
+    return {
+        "team": team_list,
+        "estimated_win_rate": avg_win_rate,
+        "individual_rates": [round(p * 100, 2) for p in team_preds]
+    }

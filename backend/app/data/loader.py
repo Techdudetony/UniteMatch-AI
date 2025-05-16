@@ -39,6 +39,10 @@ def load_data():
 
         merged_df = pd.merge(merged_df, feedback_agg, on="Name", how="left")
         merged_df["AdjustedWinRate"] = merged_df["AdjustedWinRate"].fillna(merged_df["WinRate"])
+        
+        # Ensure y is a proportion, not percentage
+        if merged_df["AdjustedWinRate"].max() > 1.0:
+            merged_df["AdjustedWinRate"] = merged_df["AdjustedWinRate"] / 100
     else:
         merged_df["AdjustedWinRate"] = merged_df["WinRate"]
     
@@ -66,6 +70,27 @@ def load_data():
     merged_df["Mobility_Endurance"] = (merged_df["Mobility"] * merged_df["Endurance"]).round(2)
     merged_df["Support_Scoring"] = (merged_df["Support"] * merged_df["Scoring"]).round(2)
     merged_df["MetaImpactScore"] = (merged_df["AdjustedWinRate"] * merged_df["UsageRate"]).round(2)
+    
+        # Extended Feature Engineering
+    merged_df["AvgDifficulty"] = merged_df["UsageDifficulty"].map({
+        "Novice": 1, "Intermediate": 2, "Expert": 3
+    })
+
+    role_counts = pd.get_dummies(merged_df["Role"], prefix="Role")
+    merged_df = pd.concat([merged_df, role_counts], axis=1)
+
+    if "PreferredLane" not in merged_df.columns:
+        merged_df["PreferredLane"] = "Unknown"
+        
+    lane_counts = pd.get_dummies(merged_df["PreferredLane"], prefix="Lane")
+    merged_df = pd.concat([merged_df, lane_counts], axis=1)
+
+    # Feedback boosted win rate (simple adjustment for now)
+    merged_df["FeedbackBoostedWinRate"] = (
+        merged_df["AdjustedWinRate"] +
+        (merged_df["Win"].fillna(0) * 0.01) -
+        (merged_df["Loss"].fillna(0) * 0.01)
+    ).clip(0, 1)
     
     # Sort data by "Name"
     merged_df.sort_values("Name", inplace=True)
