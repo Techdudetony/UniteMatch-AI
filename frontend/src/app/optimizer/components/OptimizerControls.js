@@ -1,16 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useOptimizer } from "@/context/OptimizerContext";
 
-const roles = ["Attacker", "Defender", "Speedster", "Support", "All-Rounder"];
+const roles = ["All", "Attacker", "Defender", "Speedster", "Support", "All-Rounder"];
 const lanes = ["Top", "Jungle", "Bottom"];
-const pokemonList = [
-  "pikachu", "charizard", "armarouge", "ceruledge", "darkrai", "inteleon",
-  "blastoise", "lapras", "falinks", "alolan-raichu", "galarian-rapidash",
-  "alolan-ninetales", "blissey", "comfey", "ho-oh", "zeraora", "zoroark",
-  "lucario"
-];
+const roleColors = {
+  Attacker: ["#FF6B6B", "#FFD93D"],
+  Defender: ["#4D96FF", "#1B9AAA"],
+  Support: ["#9C89B8", "#F0A6CA"],
+  Speedster: ["#56C596", "#7FFFD4"],
+  "All-Rounder": ["#9F5BFF", "#A43CC6"],
+};
 
 export default function OptimizerControls() {
   const {
@@ -18,7 +19,22 @@ export default function OptimizerControls() {
     stackSize, setStackSize,
     role, setRole,
     lane, setLane,
+    pokemonData
   } = useOptimizer();
+
+  // Reset scroll when role changes
+  const gridRef = useRef(null)
+
+  useEffect(() => {
+    if (gridRef.current) {
+      gridRef.current.scrollTop = 0;
+    }
+  }, [role]);
+
+  const pokemonList = pokemonData
+    .filter((p) => role === "All" || p.Role === role)
+    .map((p) => p.Name?.toLowerCase().replace(/ /g, "-"))
+    .filter(Boolean)
 
   const [search, setSearch] = useState("");
   const limit = stackSize === "3 Stack" ? 3 : 5;
@@ -28,16 +44,20 @@ export default function OptimizerControls() {
   );
 
   const toggleSelect = (name) => {
-    const isSelected = selectedPokemon.includes(name);
+    const isSelected = selectedPokemon.some(p => p.name === name);
+
     if (isSelected) {
-      setSelectedPokemon(selectedPokemon.filter(p => p !== name));
+      setSelectedPokemon(selectedPokemon.filter(p => p.name !== name));
     } else if (selectedPokemon.length < limit) {
-      setSelectedPokemon([...selectedPokemon, name]);
+      setSelectedPokemon([
+        ...selectedPokemon,
+        { name, lane, role }  
+      ]);
     }
   };
 
   return (
-    <div className="rounded-2xl border-4 border-black p-8 bg-gradient-to-b from-orange-400 via-pink-500 to-purple-600 shadow-xl w-[420px]">
+    <div className="rounded-2xl border-4 border-black p-8 bg-gradient-to-b from-orange-400 via-pink-500 to-purple-600 shadow-xl w-[480px]">
       {/* Role */}
       <label className="block text-white font-bold [text-shadow:_1px_1px_0_#000] mb-1">Pokemon Role</label>
       <select
@@ -88,13 +108,24 @@ export default function OptimizerControls() {
       </div>
 
       {/* Pokémon Grid */}
-      <div className="grid grid-cols-3 gap-2 max-h-[320px] overflow-y-auto pr-1">
+      <div
+        ref={gridRef}
+        className="grid grid-cols-3 gap-2 max-h-[320px] overflow-y-auto pr-1">
         {filteredPokemon.map((name) => {
-          const isSelected = selectedPokemon.includes(name);
+          const isSelected = selectedPokemon.some(p => p.name === name);
+          const matchedData = pokemonData.find(
+            (p) => p.Name?.toLowerCase().replace(/ /g, "-") === name
+          );
+          const role = matchedData?.Role;
+          const [color1, color2] = roleColors[role];
+
           return (
             <div
               key={name}
               onClick={() => toggleSelect(name)}
+              style={{
+                background: `linear-gradient(135deg, ${color1}, ${color2})`,
+              }}
               className={`
                 rounded-lg border-4 overflow-hidden cursor-pointer transition-transform duration-200
                 ${isSelected ? "border-purple-500 scale-105" : "border-black"}
@@ -104,7 +135,7 @@ export default function OptimizerControls() {
               <img
                 src={`/pokemon/${name}.png`}
                 alt={name}
-                className="object-cover w-full h-[80px] p-1"
+                className="object-contain w-full h-[80px] p-1 drop-shadow-[0_4px_6px_rgba(0,0,0,0.5)]"
               />
             </div>
           );

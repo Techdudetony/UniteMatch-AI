@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import StickyNav from "./components/StickyNav";
 import { OptimizerProvider } from "@/context/OptimizerContext"; 
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,6 +28,18 @@ export default function RootLayout({ children }) {
         <StickyNav />
         <OptimizerProvider>
           <main>{children}</main>
+          <Toaster
+            position="bottom-center"
+            toastOptions={{
+              duration: 5000,
+              style: {
+                background: "#333",
+                color: "#ff",
+                borderRadius: "12px",
+                padding: "14px",
+              },
+            }}
+          />
         </OptimizerProvider>
       </body>
     </html>

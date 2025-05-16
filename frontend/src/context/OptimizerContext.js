@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { submitUserFeedback } from "@/app/utils/api";
 
 const OptimizerContext = createContext();
 
@@ -20,6 +21,20 @@ export function OptimizerProvider({ children }) {
             .catch(console.error);
     }, []);
 
+    function submitFeedback(result) {
+        if (selectedPokemon.length === 0) {
+            return Promise.reject("No team selected");
+        }
+
+        const feedbackPayload = {
+            team: selectedPokemon.map(p => typeof p === "string" ? p : p.name),
+            result: result.toLowerCase(),
+            timestamp: new Date().toISOString(),
+        };
+
+        return submitUserFeedback(feedbackPayload);
+    }
+
     function getSynergySummary() {
         if (!pokemonData || selectedPokemon.length === 0) {
             return { winRate: 0, synergy: "Unknown", message: "", warning: "" };
@@ -36,16 +51,17 @@ export function OptimizerProvider({ children }) {
             "Unknown": 0.8,
         };
 
-        const teamData = selectedPokemon.map(name => {
+        const teamData = selectedPokemon.map(({ name }) => {
             const formatted = name
                 .split("-")
                 .map(w => w.charAt(0).toUpperCase() + w.slice(1))
                 .join(" ");
+
             return pokemonData.find(p =>
                 p.Name.toLowerCase().replace(/[^a-z0-9]/gi, "") ===
                 formatted.toLowerCase().replace(/[^a-z0-9]/gi, "")
             );
-        }).filter(Boolean); // Filter out undefined matches
+        });
 
         if (teamData.length === 0) {
             return { winRate: 0, synergy: "Unknown", message: "No data available", warning: "" };
@@ -87,6 +103,7 @@ export function OptimizerProvider({ children }) {
                 predictedDifficulties, setPredictedDifficulties,
                 isLoading, setIsLoading,
                 pokemonData,
+                submitFeedback,
                 getSynergySummary
             }}
         >

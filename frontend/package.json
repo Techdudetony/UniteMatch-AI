@@ -9,10 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "colorthief": "^2.6.0",
     "lodash": "^4.17.21",
     "next": "15.3.2",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-hot-toast": "^2.5.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
