@@ -47,3 +47,19 @@ UniteMatch AI is an AI-powered assistant that helps Pokémon Unite players build
 │ │ ├── components/ # UI components: Meter, Suggestions, SelectedTeam, etc.
 │ │ └── OptimizerPage.js # Page entry point
 │ └── context/OptimizerContext.js # Global app state (selected team, feedback, synergy)
+```
+
+---
+## How to Run
+
+### Backend:  
+```bash
+cd backend
+uvicorn main:app --reload
+```
+
+### Frontend:
+```bash
+cd frontend
+npm run dev
+```
