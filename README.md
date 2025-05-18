@@ -1,65 +1,89 @@
 # UniteMatch AI
 
-UniteMatch AI is an AI-powered assistant that helps Pokémon Unite players build better teams by predicting win rates and optimizing synergy based on in-game metadata, role diversity, lane coverage, and user feedback.
+**UniteMatch AI** is a smart team-building assistant for Pokémon Unite. It predicts team win rates and synergy levels based on player roles, lane coverage, metadata, and real user feedback — helping players build stronger, more balanced teams.
 
 ---
 
 ## Key Features
 
--  **Team Difficulty Prediction** (LightGBM)
--  **Win Rate Estimation** based on synergy features
--  **Dynamic Team Record** with win/loss tracking
--  **Synergy Meter**: visual indicator of team balance
--  **Feedback Logging**: real match data improves future predictions
--  **Suggestions Engine** [Coming Soon]
+-  **Team Difficulty Prediction** powered by LightGBM  
+-  **Win Rate Estimation** based on synergy and composition  
+-  **Dynamic Team Record**: tracks wins and losses  
+-  **Synergy Meter**: visual indicator of team cohesion  
+-  **User Feedback Loop**: logs real match outcomes to improve future predictions  
+-  **Smart Suggestions** engine for missing roles _[Coming Soon]_  
 
 ---
 
-##  Tech Stack
+## Tech Stack
 
 ### Backend
-- **Python** + **FastAPI**
-- **LightGBM** + **SMOTE** (for classification tasks)
-- **Scikit-Learn** + **Pandas**
-- **RandomForestRegressor** for synergy win rate prediction
+
+- **FastAPI** + **Python 3**
+- **LightGBM**, **RandomForestRegressor**
+- **SMOTE**, **Scikit-Learn**, **Pandas**
 
 ### Frontend
+
 - **React** + **Next.js (App Router)**
-- **Tailwind CSS** + **Framer Motion**
-- Fully client-side UI powered by React Context
+- **Tailwind CSS**, **Framer Motion**
+- **React Context API** for global state management
 
 ---
 
-##  Project Structure
+## Project Structure
 
 ```bash
+UniteMatch-AI/
 │
 ├── backend/
-│ └── app/
-│ ├── charts/ # Model evaluation visuals (confusion matrix, etc.)
-│ ├── data/ # Raw + aggregated data (CSV)
-│ ├── routes/ # FastAPI route handlers
-│ └── services/ # Core model training and prediction logic
+│   └── app/
+│       ├── charts/               # Model evaluation images (confusion matrix, ROC, etc.)
+│       ├── data/                 # Raw and enriched .csv datasets
+│       ├── routes/               # FastAPI route handlers (optimize, feedback, data)
+│       └── services/             # Core ML models and synergy scoring logic
 │
 ├── frontend/
-│ └── src/app/
-│ ├── optimizer/
-│ │ ├── components/ # UI components: Meter, Suggestions, SelectedTeam, etc.
-│ │ └── OptimizerPage.js # Page entry point
-│ └── context/OptimizerContext.js # Global app state (selected team, feedback, synergy)
+│   └── src/app/
+│       ├── optimizer/
+│       │   ├── components/       # UI pieces: Suggestions, SynergyMeter, SelectedTeam
+│       │   └── OptimizerPage.js
+│       ├── utils/
+│       │   ├── api.js            # Handles frontend → backend API calls
+│       │   ├── synergy.js        # Scores and ranks suggestions for synergy
+│       │   └── synergyBadges.js  # Generates synergy tag badges based on team comp
+│       ├── context/
+│       │   └── OptimizerContext.js  # Shared state across app
+│       └── about/
+│           └── page.js           # About screen for app purpose + background
 ```
 
 ---
-## How to Run
 
-### Backend:  
+# Getting Started
+## Backend
 ```bash
 cd backend
-uvicorn main:app --reload
+uvicorn app.main:app --reload
 ```
 
-### Frontend:
+## Frontend
 ```bash
 cd frontend
+npm install
 npm run dev
 ```
+
+---
+
+# Deployment
+### Frontend: [Vercel](https://vercel.com/)  
+### Backend: [Render](https://render.com/)
+
+**Environment Variable for Frontend:**  
+```bash
+NEXT_PUBLIC_BACKEND_URL=https://your-backend-url.onrender.com
+```
+
+## License
+This project is under the MIT License — free to use, modify, and contribute.
