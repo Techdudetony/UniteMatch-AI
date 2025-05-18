@@ -64,7 +64,7 @@ export default function SelectedTeam() {
   return (
     <>
       {/* Gradient Box */}
-      <div className="w-[450px] rounded-2xl border-4 border-black p-8 bg-gradient-to-b from-orange-400 via-pink-500 to-purple-600 shadow-xl">
+      <div className="w-[500px] rounded-2xl border-4 border-black p-8 bg-gradient-to-b from-orange-400 via-pink-500 to-purple-600 shadow-xl">
         <h2 className="text-white text-3xl font-extrabold mb-4 text-center [text-shadow:_2px_2px_0_#000]">
           Selected Team
         </h2>
@@ -160,7 +160,7 @@ export default function SelectedTeam() {
           return (
             <div
               key={filename}
-              className="flex justify-between border-b border-white/20 pb-1"
+              className="grid grid-cols-[1fr_auto_auto] gap-4 border-b border-white/20 pb-1 items-center"
             >
               <span className="font-semibold">{displayName}</span>
               <span className="text-green-400">Wins: {wins}</span>

@@ -1,12 +1,56 @@
 "use client";
 
-import React from "react";
+import React, { useState, useMemo } from "react";
 import { useOptimizer } from "@/context/OptimizerContext";
+import { scoreCandidate, getRecommendedLane } from "../../utils/synergy";
 
 export default function Suggestions() {
-  const { predictedDifficulties } = useOptimizer();
+  const { selectedPokemon, pokemonData } = useOptimizer();
+  const [expandedIndex, setExpandedIndex] = useState(null);
 
-  const isPlaceholder = (predictedDifficulties ?? []).length === 0;
+  const suggestions = useMemo(() => {
+    if (!pokemonData || selectedPokemon.length === 0) return [];
+
+    const selectedNames = selectedPokemon.map(p => p.name.toLowerCase());
+
+    const laneCounts = {};
+    const roleCounts = {};
+
+    selectedPokemon.forEach(p => {
+      if (p.lane) laneCounts[p.lane] = (laneCounts[p.lane] || 0) + 1;
+      if (p.role) roleCounts[p.role] = (roleCounts[p.role] || 0) + 1;
+    });
+
+    return pokemonData
+      .filter(p => {
+        const name = p.Name?.toLowerCase();
+        return (
+          name &&
+          !selectedNames.includes(name) &&
+          p.Role &&
+          p.PreferredLane
+        );
+      })
+      .map(p => ({
+        ...p,
+        score: scoreCandidate(p, selectedPokemon, laneCounts, roleCounts)
+      }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3)
+      .map(p => ({
+        name: p.Name,
+        role: p.Role,
+        lane: getRecommendedLane(p.Role), // Or use p.PreferredLane
+        winRate: ((p.FeedbackBoostedWinRate || 0) * 100).toFixed(2),
+        image: `/pokemon/${p.Name.toLowerCase().replace(/ /g, "-")}.png`
+      }));
+  }, [selectedPokemon, pokemonData]);
+
+  const isEmpty = suggestions.length === 0;
+
+  const toggleExpand = (index) => {
+    setExpandedIndex(expandedIndex === index ? null : index);
+  };
 
   return (
     <div className="mt-6 text-center w-full">
@@ -14,21 +58,48 @@ export default function Suggestions() {
         Suggestioned Pokémon:
       </h2>
 
-      {isPlaceholder ? (
-        <p className="text-sm text-white">Add teammates to see recommendations.</p>
+      {isEmpty ? (
+        <p className="text-sm text-white">Add teammates to get suggestions.</p>
       ) : (
         <div className="flex gap-4 justify-center mt-4">
-          {predictedDifficulties.map((pokemon, index) => (
-            <div
-              key={index}
-              className="w-20 h-20 bg-white rounded-md shadow-md overflow-hidden hover:scale-105 transition-transform border-4 border-blue-500"
-              title={pokemon.name}
-            >
-              <img
-                src={pokemon.image}
-                alt={pokemon.name}
-                className="w-full h-full object-cover"
-              />
+          {suggestions.map((pokemon, index) => (
+            <div key={index} className="relative flex flex-col items-center">
+              {/* Image Box */}
+              <div
+                onClick={() => toggleExpand(index)}
+                className="cursor-pointer relative w-20 h-20 bg-gradient-to-b from-orange-400 via-pink-500 to-purple-600 rounded-md shadow-md overflow-hidden hover:scale-105 transition-transform border-4 border-blue-500"
+                title={`${pokemon.name} – Lane: ${pokemon.lane}`}
+              >
+                <img
+                  src={pokemon.image}
+                  alt={pokemon.name}
+                  className="w-full h-full object-cover"
+                />
+                {/* Lane Badge */}
+                <img
+                  src={`/lanes/${pokemon.lane.toLowerCase()}.png`}
+                  alt={pokemon.lane}
+                  className="absolute bottom-1 right-1 w-5 h-5"
+                />
+              </div>
+
+              {/* Expand Info Card */}
+              {expandedIndex === index && (
+                <div className="mt-2 bg-black bg-opacity-80 hover:bg-opacity-30 text-white p-2 rounded-lg text-xs shadow-lg w-36 text-left z-10">
+                  <p className="font-bold">{pokemon.name}</p>
+                  <div className="flex items-center gap-1">
+                    <img
+                      src={`/lanes/${pokemon.lane.toLowerCase()}.png`}
+                      alt="lane"
+                      className="w-4 h-4"
+                    />
+                    <span>{pokemon.lane}</span>
+                  </div>
+                  <p className="text-green-400">
+                    Boosted Win Rate: {pokemon.winRate}%
+                  </p>
+                </div>
+              )}
             </div>
           ))}
         </div>

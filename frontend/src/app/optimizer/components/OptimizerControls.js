@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useOptimizer } from "@/context/OptimizerContext";
 
-const roles = ["All", "Attacker", "Defender", "Speedster", "Support", "All-Rounder"];
+const roles = ["Attacker", "Defender", "Speedster", "Support", "All-Rounder"];
 const lanes = ["Top", "Jungle", "Bottom"];
 const roleColors = {
   Attacker: ["#FF6B6B", "#FFD93D"],
@@ -32,7 +32,7 @@ export default function OptimizerControls() {
   }, [role]);
 
   const pokemonList = pokemonData
-    .filter((p) => role === "All" || p.Role === role)
+    .filter((p) => p.Role === role)
     .map((p) => p.Name?.toLowerCase().replace(/ /g, "-"))
     .filter(Boolean)
 
@@ -43,21 +43,25 @@ export default function OptimizerControls() {
     p.toLowerCase().includes(search.toLowerCase())
   );
 
+  const isSelectionValid = role && lane;
+
   const toggleSelect = (name) => {
     const isSelected = selectedPokemon.some(p => p.name === name);
+
+    if (!isSelectionValid) return; // Block until both selected
 
     if (isSelected) {
       setSelectedPokemon(selectedPokemon.filter(p => p.name !== name));
     } else if (selectedPokemon.length < limit) {
       setSelectedPokemon([
         ...selectedPokemon,
-        { name, lane, role }  
+        { name, lane, role }
       ]);
     }
   };
 
   return (
-    <div className="rounded-2xl border-4 border-black p-8 bg-gradient-to-b from-orange-400 via-pink-500 to-purple-600 shadow-xl w-[480px]">
+    <div className="rounded-2xl border-4 border-black p-8 bg-gradient-to-b from-orange-400 via-pink-500 to-purple-600 shadow-xl w-[500px]">
       {/* Role */}
       <label className="block text-white font-bold [text-shadow:_1px_1px_0_#000] mb-1">Pokemon Role</label>
       <select
@@ -65,7 +69,10 @@ export default function OptimizerControls() {
         onChange={(e) => setRole(e.target.value)}
         className="w-full mb-4 p-2 rounded-lg border bg-white focus:outline-none text-black"
       >
-        {roles.map((r) => <option key={r}>{r}</option>)}
+        <option disabled value="">Select Role</option>
+        {roles.map((r) => (
+          <option key={r} value={r}>{r}</option>
+        ))}
       </select>
 
       {/* Lane */}
@@ -75,7 +82,10 @@ export default function OptimizerControls() {
         onChange={(e) => setLane(e.target.value)}
         className="w-full mb-4 p-2 rounded-lg border bg-white focus:outline-none text-black"
       >
-        {lanes.map((l) => <option key={l}>{l}</option>)}
+        <option disabled value="">Select Lane</option>
+        {lanes.map((l) => (
+          <option key={l} value={l}>{l}</option>
+        ))}
       </select>
 
       {/* Stack Toggle */}
@@ -108,39 +118,45 @@ export default function OptimizerControls() {
       </div>
 
       {/* Pokémon Grid */}
-      <div
-        ref={gridRef}
-        className="grid grid-cols-3 gap-2 max-h-[320px] overflow-y-auto pr-1">
-        {filteredPokemon.map((name) => {
-          const isSelected = selectedPokemon.some(p => p.name === name);
-          const matchedData = pokemonData.find(
-            (p) => p.Name?.toLowerCase().replace(/ /g, "-") === name
-          );
-          const role = matchedData?.Role;
-          const [color1, color2] = roleColors[role];
+      {isSelectionValid ? (
+        <div
+          ref={gridRef}
+          className="grid grid-cols-3 gap-2 max-h-[320px] overflow-y-auto pr-1">
+          {filteredPokemon.map((name) => {
+            const isSelected = selectedPokemon.some(p => p.name === name);
+            const matchedData = pokemonData.find(
+              (p) => p.Name?.toLowerCase().replace(/ /g, "-") === name
+            );
+            const role = matchedData?.Role;
+            const [color1, color2] = roleColors[role];
 
-          return (
-            <div
-              key={name}
-              onClick={() => toggleSelect(name)}
-              style={{
-                background: `linear-gradient(135deg, ${color1}, ${color2})`,
-              }}
-              className={`
+            return (
+              <div
+                key={name}
+                onClick={() => toggleSelect(name)}
+                style={{
+                  background: `linear-gradient(135deg, ${color1}, ${color2})`,
+                }}
+                className={`
                 rounded-lg border-4 overflow-hidden cursor-pointer transition-transform duration-200
                 ${isSelected ? "border-purple-500 scale-105" : "border-black"}
                 hover:border-orange-400 hover:scale-105
               `}
-            >
-              <img
-                src={`/pokemon/${name}.png`}
-                alt={name}
-                className="object-contain w-full h-[80px] p-1 drop-shadow-[0_4px_6px_rgba(0,0,0,0.5)]"
-              />
-            </div>
-          );
-        })}
-      </div>
+              >
+                <img
+                  src={`/pokemon/${name}.png`}
+                  alt={name}
+                  className="object-contain w-full h-[80px] p-1 drop-shadow-[0_4px_6px_rgba(0,0,0,0.5)]"
+                />
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="text-white text-sm italic text-center mt-4">
+          Please select a role and lane to continue.
+        </p>
+      )}
     </div>
   );
 }

@@ -8,8 +8,8 @@ const OptimizerContext = createContext();
 export function OptimizerProvider({ children }) {
     const [selectedPokemon, setSelectedPokemon] = useState([]);
     const [stackSize, setStackSize] = useState("3 Stack");
-    const [role, setRole] = useState("Attacker");
-    const [lane, setLane] = useState("Jungle");
+    const [role, setRole] = useState("");
+    const [lane, setLane] = useState("");
     const [predictedDifficulties, setPredictedDifficulties] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [pokemonData, setPokemonData] = useState([]);
