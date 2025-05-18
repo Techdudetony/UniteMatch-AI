@@ -80,8 +80,16 @@ export default function SelectedTeam() {
               );
 
               return (
-                <div key={filename} className="flex items-center gap-4">
-                  <div className="w-22 h-22 rounded-lg border-4 border-purple-500 overflow-hidden bg-gradient-to-b from-orange-600 to-purple-600">
+                <div
+                  key={filename}
+                  onClick={() =>
+                    setSelectedPokemon((prev) => prev.filter((p) => p.name !== filename))
+                  }
+                  className="flex items-center gap-4 group cursor-pointer hover:opacity-90"
+                  title="Click to remove this Pokémon from the team"
+                >
+                  {/* Image Box with Hover X */}
+                  <div className="relative w-22 h-22 rounded-lg border-4 border-purple-500 overflow-hidden bg-gradient-to-b from-orange-600 to-purple-600">
                     <Image
                       src={`/pokemon/${filename}.png`}
                       alt={displayName}
@@ -90,8 +98,12 @@ export default function SelectedTeam() {
                       unoptimized
                       className="object-contain w-full h-full"
                     />
+                    <div className="absolute top-0 right-0 p-1 bg-red-600 text-white text-xs font-bold rounded-bl-md opacity-0 group-hover:opacity-100 transition">
+                      X
+                    </div>
                   </div>
 
+                  {/* Text Block */}
                   <div className="text-white font-bold leading-tight text-xl [text-shadow:_1px_1px_0_#000]">
                     <div>{displayName}</div>
                     <div className="text-lg">
@@ -114,22 +126,20 @@ export default function SelectedTeam() {
           <button
             onClick={handleExport}
             disabled={selectedPokemon.length === 0}
-            className={`${
-              selectedPokemon.length === 0
-                ? "opacity-50 cursor-not-allowed"
-                : ""
-            } bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-xl shadow-md transition`}
+            className={`${selectedPokemon.length === 0
+              ? "opacity-50 cursor-not-allowed"
+              : ""
+              } bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-xl shadow-md transition`}
           >
             Export
           </button>
           <button
             onClick={() => setSelectedPokemon([])}
             disabled={selectedPokemon.length === 0}
-            className={`${
-              selectedPokemon.length === 0
-                ? "opacity-50 cursor-not-allowed"
-                : ""
-            } bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-xl shadow-md transition`}
+            className={`${selectedPokemon.length === 0
+              ? "opacity-50 cursor-not-allowed"
+              : ""
+              } bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-xl shadow-md transition`}
           >
             Reset
           </button>

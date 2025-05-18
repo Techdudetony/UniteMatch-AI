@@ -31,17 +31,25 @@ export default function OptimizerControls() {
     }
   }, [role]);
 
-  const pokemonList = pokemonData
-    .filter((p) => p.Role === role)
+  const allPokemon = pokemonData
     .map((p) => p.Name?.toLowerCase().replace(/ /g, "-"))
-    .filter(Boolean)
+    .filter(Boolean);
 
   const [search, setSearch] = useState("");
   const limit = stackSize === "3 Stack" ? 3 : 5;
 
-  const filteredPokemon = pokemonList.filter(p =>
-    p.toLowerCase().includes(search.toLowerCase())
+  // Search ignores role filter, shows from all Pokémon
+  const searchFiltered = allPokemon.filter(name =>
+    name.includes(search.toLowerCase())
   );
+
+  // Role filter applies only when NOT searching
+  const pokemonList = search
+    ? searchFiltered
+    : pokemonData
+      .filter((p) => p.Role === role)
+      .map((p) => p.Name?.toLowerCase().replace(/ /g, "-"))
+      .filter(Boolean);
 
   const isSelectionValid = role && lane;
 
@@ -50,12 +58,16 @@ export default function OptimizerControls() {
 
     if (!isSelectionValid) return; // Block until both selected
 
+    const matchedData = pokemonData.find(
+      (p) => p.Name?.toLowerCase().replace(/ /g, "-") === name
+    );
+
     if (isSelected) {
       setSelectedPokemon(selectedPokemon.filter(p => p.name !== name));
-    } else if (selectedPokemon.length < limit) {
+    } else if (selectedPokemon.length < limit && matchedData) {
       setSelectedPokemon([
         ...selectedPokemon,
-        { name, lane, role }
+        { name, lane, role: matchedData.Role }
       ]);
     }
   };
@@ -122,7 +134,7 @@ export default function OptimizerControls() {
         <div
           ref={gridRef}
           className="grid grid-cols-3 gap-2 max-h-[320px] overflow-y-auto pr-1">
-          {filteredPokemon.map((name) => {
+          {pokemonList.map((name) => {
             const isSelected = selectedPokemon.some(p => p.name === name);
             const matchedData = pokemonData.find(
               (p) => p.Name?.toLowerCase().replace(/ /g, "-") === name
