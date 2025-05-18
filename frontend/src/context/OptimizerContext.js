@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, useMemo } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { submitUserFeedback, fetchSynergyWinrate } from "@/app/utils/api";
 
 const OptimizerContext = createContext();
@@ -17,14 +17,14 @@ export function OptimizerProvider({ children }) {
 
     // Fetch metadata
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/data-preview")
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/data-preview`)
             .then(res => res.json())
             .then(setPokemonData)
             .catch(console.error);
     }, []);
 
     function refreshPokemonData() {
-        fetch("http://127.0.0.1:8000/data-preview")
+        fetch(`{process.env.NEXT_PUBLIC_BACKEND_URL}/data-preview`)
             .then(res => res.json())
             .then(setPokemonData)
             .catch(console.error);
