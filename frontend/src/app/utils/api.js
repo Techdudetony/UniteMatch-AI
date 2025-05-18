@@ -1,4 +1,4 @@
-const BASE_URL = "http://127.0.0.1:8000"
+const BASE_URL = "https://unitematch-ai-backend.onrender.com";
 
 export async function fetchDataPreview() {
     const res = await fetch(`${BASE_URL}/data-preview`);
