@@ -1,4 +1,4 @@
-const BASE_URL = "https://unitematch-ai-backend.onrender.com";
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export async function fetchDataPreview() {
     const res = await fetch(`${BASE_URL}/data-preview`);
