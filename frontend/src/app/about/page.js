@@ -21,7 +21,7 @@ export default function AboutPage() {
         </p>
 
         <p className="text-md md:text-xl font-medium">
-          Whether you're solo queuing or playing as a coordinated 5-stack,
+          Whether you are solo queuing or playing as a coordinated 5-stack,
           UniteMatch AI helps you build balanced, high-synergy compositions—
           fast.
         </p>
