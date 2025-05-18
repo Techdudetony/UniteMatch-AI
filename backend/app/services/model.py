@@ -1,10 +1,10 @@
 import os
 import pandas as pd
+import joblib
 from datetime import datetime
 from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, classification_report
-from sklearn.ensemble import RandomForestRegressor
 from lightgbm import LGBMClassifier
 from imblearn.over_sampling import SMOTE
 from collections import Counter
@@ -89,6 +89,10 @@ def build_model(tune: bool = False):
 
     # Log results
     log_training_result(accuracy, best_params, dict(zip(X.columns, clf.feature_importances_)), f1)
+    
+    os.makedirs("backend/app/models", exist_ok=True)
+    joblib.dump(clf, "backend/app/models/lightgbm_model.pkl")
+    joblib.dump(encoder, "backend/app/models/label_encoder.pkl")
 
     return {
         "model": clf,
@@ -129,43 +133,26 @@ def log_training_result(accuracy, params, feature_importance, f1):
             writer.to_csv(file, header=False, index=False)
 
 def optimize_team(team_list: list[str]):
-    """
-    Predicts usage difficulty for a list of Pokémon based on the trained model.
-
-    Args:
-        team_list (list[str]): List of Pokémon names.
-
-    Returns:
-        list[dict]: Each Pokémon's name and predicted difficulty level.
-    """
-    # Load the full dataset and encoded features
     final_df, df = load_data()
 
-    # Build the model and get components
-    data = build_model()
-    clf = data["model"]
-    encoder = data["encoder"]
-    features = data["features"]
+    # Load pretrained model
+    clf, encoder = load_model()
+    features = clf.feature_name_  # Retrieves feature names used during training
 
-    # Ensure matching name types
     df["Name"] = df["Name"].astype(str)
     team_list = [normalize_name(name) for name in team_list]
 
-    #Boolean mask for team selection
     mask = df["Name"].isin(team_list)
     team_df = df[mask]
     X_team = final_df.loc[mask, features]
 
-    # Check for missing Pokémon names
     if team_df.empty or len(team_df) != len(team_list):
         missing = set(team_list) - set(team_df["Name"])
         raise ValueError(f"Missing data for: {', '.join(missing)}")
 
-    # Make predictions
     preds = clf.predict(X_team)
     decoded = encoder.inverse_transform(preds)
 
-    # Return results
     return [{"name": name, "predicted_difficulty": diff} for name, diff in zip(team_df["Name"], decoded)]
 
 def get_cleaned_data():
@@ -261,3 +248,16 @@ def compute_synergy_features(team_df: pd.DataFrame) -> pd.DataFrame:
     features["synergy_variance"] = team_df[["Offense", "Support", "Mobility", "Endurance"]].var().mean()
 
     return pd.DataFrame([features])
+
+def load_model():
+    model_path = "backend/app/models/lightgbm_model.pkl"
+    encoder_path = "backend/app/models/label_encoder.pkl"
+    
+    if not os.path.exists(model_path) or not os.path.exists(encoder_path):
+        raise FileNotFoundError("Pretrained model or encoder not found. Please train and save the model first.")
+    
+    model = joblib.load(model_path)
+    encoder = joblib.load(encoder_path)
+    
+    return model, encoder
+
