@@ -2,37 +2,13 @@
 
 import React from "react";
 import { useOptimizer } from "@/context/OptimizerContext";
+import { getSynergyBadges } from "../../utils/synergyBadges";
 
 export default function SynergyMeter() {
-  const { synergy } = useOptimizer();
+  const { synergy, selectedPokemon } = useOptimizer();
   const winRate = synergy?.winRate ?? 0;
 
-  // Interpret synergy label
-  let synergyLabel = "Unknown";
-  let message = "";
-
-  if (winRate < 35) {
-    synergyLabel = "Fragile";
-    message = "Your team might struggle to hold objectives.";
-  } else if (winRate > 60) {
-    synergyLabel = "Overcrowded";
-    message = "Too many damage dealers — consider adding support.";
-  } else {
-    synergyLabel = "Balanced";
-  }
-
-  const getSynergyColor = (type) => {
-    switch (type) {
-      case "Overcrowded":
-        return "bg-red-600 text-white";
-      case "Fragile":
-        return "bg-yellow-300 text-black border-4 border-black";
-      case "Balanced":
-        return "bg-green-500 text-white";
-      default:
-        return "bg-gray-500 text-white";
-    }
-  };
+  const badges = getSynergyBadges(selectedPokemon);
 
   return (
     <div className="flex flex-col items-center gap-4 text-center">
@@ -51,19 +27,45 @@ export default function SynergyMeter() {
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
           <span className="text-4xl">Win Rate</span>
-          <span className="text-6xl font-bold">{isNaN(winRate) ? "?" : `${winRate}%`}</span>
+          <span className="text-6xl font-bold">{isNaN(winRate) ? "?" : `${winRate.toFixed(2)}%`}</span>
         </div>
       </div>
 
-      {/* Synergy Tag */}
-      <div className={`text-3xl font-bold px-8 py-2 rounded ${getSynergyColor(synergyLabel)}`}>
-        {synergyLabel}
-      </div>
+      {/* Synergy Badges */}
+      {badges.length > 0 && (
+        <div className="flex flex-wrap justify-center gap-2 mt-4">
+          {badges.map((badge, i) => (
+            <span
+              key={i}
+              className={`text-white font-bold text-sm px-3 py-1 rounded-full ${badge.color}`}
+            >
+              {badge.label}
+            </span>
+          ))}
+        </div>
+      )}
 
-      {/* Message */}
-      {message && (
-        <p className="italic text-sm text-white mt-2 max-w-[300px]">{message}</p>
+      {/* Suggestion Comment */}
+      {badges.length > 0 && (
+        <div className="mt-2 text-md italic text-white max-w-[340px]">
+          {generateBadgeMessage(badges)}
+        </div>
       )}
     </div>
   );
+}
+
+// Dynamic suggestion comment based on badge presence
+function generateBadgeMessage(badges) {
+  const labels = badges.map(b => b.label);
+
+  if (labels.includes("Lane Conflict")) return "Too many Pokémon may be contesting Jungle.";
+  if (labels.includes("No Support")) return "You might want to add a Supporter for healing or backup.";
+  if (labels.includes("No Defender")) return "Consider adding a tanky Defender to hold objectives.";
+  if (labels.includes("Stacked Role")) return "Try diversifying your team roles for better synergy.";
+  if (labels.includes("Perfect Lane Coverage")) return "Your team has great lane spread!";
+  if (labels.includes("Balanced Core")) return "You've got strong foundation across all fronts.";
+  if (labels.includes("Low Mobility")) return "Watch out for slow team rotation—consider faster roles.";
+
+  return "Team synergy looks solid—optimize further based on strategy.";
 }

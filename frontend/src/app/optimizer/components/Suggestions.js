@@ -5,7 +5,7 @@ import { useOptimizer } from "@/context/OptimizerContext";
 import { scoreCandidate, getRecommendedLane } from "../../utils/synergy";
 
 export default function Suggestions() {
-  const { selectedPokemon, pokemonData } = useOptimizer();
+  const { selectedPokemon, pokemonData, stackSize } = useOptimizer(); // 🆕
   const [expandedIndex, setExpandedIndex] = useState(null);
 
   const suggestions = useMemo(() => {
@@ -33,18 +33,18 @@ export default function Suggestions() {
       })
       .map(p => ({
         ...p,
-        score: scoreCandidate(p, selectedPokemon, laneCounts, roleCounts)
+        score: scoreCandidate(p, selectedPokemon, laneCounts, roleCounts, stackSize) // 🆕
       }))
       .sort((a, b) => b.score - a.score)
       .slice(0, 3)
       .map(p => ({
         name: p.Name,
         role: p.Role,
-        lane: getRecommendedLane(p.Role), // Or use p.PreferredLane
+        lane: getRecommendedLane(p.Role),
         winRate: ((p.FeedbackBoostedWinRate || 0) * 100).toFixed(2),
         image: `/pokemon/${p.Name.toLowerCase().replace(/ /g, "-")}.png`
       }));
-  }, [selectedPokemon, pokemonData]);
+  }, [selectedPokemon, pokemonData, stackSize]); // 🧠
 
   const isEmpty = suggestions.length === 0;
 
@@ -64,7 +64,7 @@ export default function Suggestions() {
         <div className="flex gap-4 justify-center mt-4">
           {suggestions.map((pokemon, index) => (
             <div key={index} className="relative flex flex-col items-center">
-              {/* Image Box */}
+              {/* Clickable Card */}
               <div
                 onClick={() => toggleExpand(index)}
                 className="cursor-pointer relative w-20 h-20 bg-gradient-to-b from-orange-400 via-pink-500 to-purple-600 rounded-md shadow-md overflow-hidden hover:scale-105 transition-transform border-4 border-blue-500"
@@ -75,7 +75,6 @@ export default function Suggestions() {
                   alt={pokemon.name}
                   className="w-full h-full object-cover"
                 />
-                {/* Lane Badge */}
                 <img
                   src={`/lanes/${pokemon.lane.toLowerCase()}.png`}
                   alt={pokemon.lane}
@@ -83,10 +82,11 @@ export default function Suggestions() {
                 />
               </div>
 
-              {/* Expand Info Card */}
+              {/* Expansion Panel */}
               {expandedIndex === index && (
                 <div className="mt-2 bg-black bg-opacity-80 hover:bg-opacity-30 text-white p-2 rounded-lg text-xs shadow-lg w-36 text-left z-10">
                   <p className="font-bold">{pokemon.name}</p>
+                  <span>{pokemon.role}</span>
                   <div className="flex items-center gap-1">
                     <img
                       src={`/lanes/${pokemon.lane.toLowerCase()}.png`}

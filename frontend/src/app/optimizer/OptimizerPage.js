@@ -47,11 +47,11 @@ export default function OptimizerPage() {
       {/* Left Column */}
       <div className="space-y-6">
         <OptimizerControls />
-        <Suggestions />
       </div>
 
       {/* Center Column */}
-      <div className="flex items-center justify-center">
+      <div className="space-y-6">
+        <Suggestions />
         <SynergyMeter />
       </div>
 
