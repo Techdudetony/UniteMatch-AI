@@ -17,3 +17,7 @@ app.add_middleware(
 app.include_router(data.router)
 app.include_router(optimize.router)
 app.include_router(feedback.router)
+
+@app.get("/")
+def root():
+    return {"message": "UniteMatch AI Backend is live!"}
