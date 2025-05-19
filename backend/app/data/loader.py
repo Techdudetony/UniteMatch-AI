@@ -1,5 +1,7 @@
 import pandas as pd
 import os
+from app.db import SessionLocal
+from app.data.feedback_model import Feedback
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 FILE = os.path.join(DIRECTORY, "PokemonUniteData.csv")
@@ -8,6 +10,42 @@ META_FILE = os.path.join(DIRECTORY, "uniteapi_metadata.csv")
 def normalize_name(name):
     # Converts "alolan-raichu" or "Alolan Raichu" to "Alolan Raichu"
     return ' '.join(word.capitalize() for word in name.replace("-", " ").split())
+
+from app.db import SessionLocal
+from app.data.feedback_model import Feedback
+
+# Feedback Data Aggregate (PostgreSQL version)
+def get_feedback_aggregates():
+    db = SessionLocal()
+    try:
+        # Query all feedback entries
+        feedback_entries = db.query(Feedback).all()
+
+        # Convert to DataFrame
+        if not feedback_entries:
+            return None
+
+        import pandas as pd
+        feedback_df = pd.DataFrame([
+            {"Name": fb.name.title(), "Result": fb.result}
+            for fb in feedback_entries
+        ])
+
+        # Pivot to aggregate win/loss
+        feedback_agg = (
+            feedback_df.pivot_table(index="Name", columns="Result", aggfunc="size", fill_value=0)
+            .reset_index()
+            .rename(columns={"win": "Win", "loss": "Loss"})
+        )
+
+        # Calculate Adjusted Win Rate
+        feedback_agg["AdjustedWinRate"] = (
+            feedback_agg["Win"] / (feedback_agg["Win"] + feedback_agg["Loss"])
+        ).fillna(0).round(2)
+
+        return feedback_agg
+    finally:
+        db.close()
 
 def load_data():
     """Loads and returns cleaned, merged Pokémon Unite data"""
@@ -27,24 +65,17 @@ def load_data():
     merged_df = meta_df.merge(base_df_cleaned, on="Name", how="left")
     
     # Feedback Data Aggregate
-    FEEDBACK_FILE = os.path.join(DIRECTORY, "user_feedback.csv")
-    if os.path.exists(FEEDBACK_FILE):
-        feedback_df = pd.read_csv(FEEDBACK_FILE)
-        feedback_agg = (
-            feedback_df.groupby("Name")[["Win", "Loss"]].sum().reset_index()
-        )
-        feedback_agg["AdjustedWinRate"] = (
-            feedback_agg["Win"] / (feedback_agg["Win"] + feedback_agg["Loss"])
-        ).fillna(0).round(2)
+    feedback_agg = get_feedback_aggregates()
 
+    if feedback_agg is not None:
         merged_df = pd.merge(merged_df, feedback_agg, on="Name", how="left")
         merged_df["AdjustedWinRate"] = merged_df["AdjustedWinRate"].fillna(merged_df["WinRate"])
-        
-        # Ensure y is a proportion, not percentage
-        if merged_df["AdjustedWinRate"].max() > 1.0:
-            merged_df["AdjustedWinRate"] = merged_df["AdjustedWinRate"] / 100
+        merged_df["Win"] = merged_df["Win"].fillna(0).astype(int)
+        merged_df["Loss"] = merged_df["Loss"].fillna(0).astype(int)
     else:
         merged_df["AdjustedWinRate"] = merged_df["WinRate"]
+        merged_df["Win"] = 0
+        merged_df["Loss"] = 0
     
     # Drop unnecessary description column
     merged_df.drop(columns=["Description"], inplace=True)
