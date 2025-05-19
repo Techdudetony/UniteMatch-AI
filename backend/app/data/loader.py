@@ -151,5 +151,9 @@ def load_data():
     encoded_df = pd.get_dummies(merged_df[categorical_cols], prefix=categorical_cols)
 
     final_df = pd.concat([numeric_df, encoded_df], axis=1)
+    
+    # Ensure JSON-safe values before returning merged_df
+    merged_df.replace([float('inf'), float('-inf')], pd.NA, inplace=True)
+    merged_df = merged_df.fillna(0)
 
     return final_df, merged_df
