@@ -38,7 +38,10 @@ def get_feedback_aggregates():
             .rename(columns={"win": "Win", "loss": "Loss"})
         )
 
-        # Calculate Adjusted Win Rate
+        # Calculate Adjusted Win Rate (safe fallback if Win or Loss doesn't exist)
+        feedback_agg["Win"] = feedback_agg.get("Win", 0)
+        feedback_agg["Loss"] = feedback_agg.get("Loss", 0)
+
         feedback_agg["AdjustedWinRate"] = (
             feedback_agg["Win"] / (feedback_agg["Win"] + feedback_agg["Loss"])
         ).fillna(0).round(2)
@@ -78,7 +81,7 @@ def load_data():
         merged_df["Loss"] = 0
     
     # Drop unnecessary description column
-    merged_df.drop(columns=["Description"], errors="ignore", inplace=True)
+    merged_df.drop(columns=["Description"], inplace=True)
 
     # Debugging: log unmatched entries
     unmatched = meta_df[~meta_df["Name"].isin(merged_df["Name"])]
