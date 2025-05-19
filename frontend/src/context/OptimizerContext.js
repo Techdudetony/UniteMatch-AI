@@ -24,7 +24,7 @@ export function OptimizerProvider({ children }) {
     }, []);
 
     function refreshPokemonData() {
-        fetch(`{process.env.NEXT_PUBLIC_BACKEND_URL}/data-preview`)
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/data-preview`)
             .then(res => res.json())
             .then(setPokemonData)
             .catch(console.error);
