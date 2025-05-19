@@ -129,6 +129,17 @@ def load_data():
 
     # Sort for consistency
     merged_df.sort_values("Name", inplace=True)
+    
+    # Ensure essential columns exist for frontend filtering and display
+    required_columns = {
+        "Role": "Unknown",
+        "PreferredLane": "Unknown",
+        "Tier": "Unknown",
+        "UsageDifficulty": "Unknown"
+    }
+    for col, default in required_columns.items():
+        if col not in merged_df.columns:
+            merged_df[col] = default
 
     # Prepare final model input
     numeric_df = merged_df.select_dtypes(include=['float64', 'int64'])
