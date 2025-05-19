@@ -118,7 +118,7 @@ export function OptimizerProvider({ children }) {
         }
 
         return {
-            winRate: Math.round(avgWinRate * 100),
+            winRate: Math.round(avgWinRate / 100),
             synergy,
             message,
             warning: ""
