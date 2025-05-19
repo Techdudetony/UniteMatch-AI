@@ -30,7 +30,7 @@ export function OptimizerProvider({ children }) {
             .catch(console.error);
     }
 
-    function submitFeedback(result) {
+    async function submitFeedback(result) {
         if (selectedPokemon.length === 0) {
             return Promise.reject("No team selected");
         }
@@ -41,7 +41,24 @@ export function OptimizerProvider({ children }) {
             timestamp: new Date().toISOString(),
         };
 
-        return submitUserFeedback(feedbackPayload);
+        try {
+            const response = await submitUserFeedback(feedbackPayload);
+            await refetchPokemonData(); // <- Important to refresh the feedback aggregation
+            return response;
+        } catch (err) {
+            console.error("Error submitting feedback:", err);
+            throw err;
+        }
+    }
+
+    const refetchPokemonData = async () => {
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/data-preview`);
+            const updatedData = await res.json();
+            setPokemonData(updatedData);
+        } catch (err) {
+            console.error("Error fetching updated data:", err);
+        }
     }
 
     function getSynergySummary() {
