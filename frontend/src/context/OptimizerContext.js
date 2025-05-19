@@ -91,30 +91,31 @@ export function OptimizerProvider({ children }) {
             );
         });
 
-        if (teamData.length === 0) {
-            return { winRate: 0, synergy: "Unknown", message: "No data available", warning: "" };
+        if (teamData.some(p => !p)) {
+            return { winRate: 0, synergy: "Unknown", message: "Missing Pokémon data", warning: "" };
         }
 
         const adjustedWinRates = teamData.map(p => {
-            const baseWinRate = p.WinRate || 0;
+            const raw = (p.FeedbackBoostedWinRate ?? p.AdjustedWinRate ?? p.WinRate ?? 0) / 100;
             const tier = (p.Tier || "Unknown").toUpperCase();
             const multiplier = tierWeights[tier] || tierWeights["Unknown"];
-            return baseWinRate * multiplier
-        })
+            return raw * multiplier;
+        });
+
         const avgWinRate = adjustedWinRates.reduce((sum, val) => sum + val, 0) / adjustedWinRates.length;
 
         let synergy = "Balanced";
         let message = "";
-        if (avgWinRate < 35) {
+        if (avgWinRate < 0.35) {
             synergy = "Fragile";
             message = "Your team might struggle to hold objectives.";
-        } else if (avgWinRate > 60) {
+        } else if (avgWinRate > 0.6) {
             synergy = "Overcrowded";
             message = "Too many damage dealers — consider adding support.";
         }
 
         return {
-            winRate: Math.round(avgWinRate),
+            winRate: Math.round(avgWinRate * 100),
             synergy,
             message,
             warning: ""
