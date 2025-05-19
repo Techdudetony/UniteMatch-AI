@@ -27,7 +27,7 @@ def get_feedback_aggregates():
 
         import pandas as pd
         feedback_df = pd.DataFrame([
-            {"Name": fb.name.title(), "Result": fb.result}
+            {"Name": normalize_name(fb.name), "Result": fb.result}
             for fb in feedback_entries
         ])
 
