@@ -6,7 +6,10 @@ import { getSynergyBadges } from "../../utils/synergyBadges";
 
 export default function SynergyMeter() {
   const { synergy, selectedPokemon } = useOptimizer();
-  const winRate = synergy?.winRate ?? 0;
+
+  // Clamp win rate to 0–100 for display and stroke
+  const rawWinRate = synergy?.winRate ?? 0;
+  const winRate = Math.min(Math.max(rawWinRate, 0), 100); // ensure no NaN or overflow
 
   const badges = getSynergyBadges(selectedPokemon);
 
@@ -27,7 +30,9 @@ export default function SynergyMeter() {
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
           <span className="text-4xl">Win Rate</span>
-          <span className="text-6xl font-bold">{isNaN(winRate) ? "?" : `${winRate.toFixed(2)}%`}</span> {/* Fix winRate to MAXIMUM 100% */}
+          <span className="text-6xl font-bold">
+            {isNaN(winRate) ? "?" : `${winRate.toFixed(2)}%`}
+          </span>
         </div>
       </div>
 
@@ -55,7 +60,7 @@ export default function SynergyMeter() {
   );
 }
 
-// Dynamic suggestion comment based on badge presence
+// Suggestion text based on synergy badge presence
 function generateBadgeMessage(badges) {
   const labels = badges.map(b => b.label);
 

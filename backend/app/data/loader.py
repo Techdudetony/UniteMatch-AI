@@ -11,34 +11,25 @@ def normalize_name(name):
     # Converts "alolan-raichu" or "Alolan Raichu" to "Alolan Raichu"
     return ' '.join(word.capitalize() for word in name.replace("-", " ").split())
 
-from app.db import SessionLocal
-from app.data.feedback_model import Feedback
-
 # Feedback Data Aggregate (PostgreSQL version)
 def get_feedback_aggregates():
     db = SessionLocal()
     try:
-        # Query all feedback entries
         feedback_entries = db.query(Feedback).all()
-
-        # Convert to DataFrame
         if not feedback_entries:
             return None
 
-        import pandas as pd
         feedback_df = pd.DataFrame([
             {"Name": normalize_name(fb.name), "Result": fb.result}
             for fb in feedback_entries
         ])
 
-        # Pivot to aggregate win/loss
         feedback_agg = (
             feedback_df.pivot_table(index="Name", columns="Result", aggfunc="size", fill_value=0)
             .reset_index()
             .rename(columns={"win": "Win", "loss": "Loss"})
         )
 
-        # Calculate Adjusted Win Rate (safe fallback if Win or Loss doesn't exist)
         feedback_agg["Win"] = feedback_agg.get("Win", 0)
         feedback_agg["Loss"] = feedback_agg.get("Loss", 0)
 
@@ -51,23 +42,26 @@ def get_feedback_aggregates():
         db.close()
 
 def load_data():
-    """Loads and returns cleaned, merged Pokémon Unite data"""
-    
-    # Load main and meta data
+    """Loads and returns cleaned, merged Pokémon Unite data with feedback boost logic."""
+
+    # Load raw CSVs
     base_df = pd.read_csv(FILE)
     meta_df = pd.read_csv(META_FILE)
+
+    # Convert WinRate from percentage to decimal (e.g., 52.8% -> 0.528)
+    meta_df["WinRate"] = meta_df["WinRate"] / 100.0
 
     # Normalize names for matching
     base_df["Name"] = base_df["Name"].apply(normalize_name)
     meta_df["Name"] = meta_df["Name"].apply(normalize_name)
 
-    # Drop columns that already exist in meta_df or aren't needed
+    # Drop any conflicting or duplicate columns from base data
     base_df_cleaned = base_df.drop(columns=["UsageDifficulty", "Role", "Ranged_or_Melee"], errors="ignore")
 
-    # Merge on normalized names
+    # Merge main dataset with metadata from UniteAPI
     merged_df = meta_df.merge(base_df_cleaned, on="Name", how="left")
-    
-    # Feedback Data Aggregate
+
+    # Pull feedback from DB and aggregate it
     feedback_agg = get_feedback_aggregates()
 
     if feedback_agg is not None:
@@ -79,54 +73,48 @@ def load_data():
         merged_df["AdjustedWinRate"] = merged_df["WinRate"]
         merged_df["Win"] = 0
         merged_df["Loss"] = 0
-    
-    # Drop unnecessary description column
-    merged_df.drop(columns=["Description"], inplace=True)
 
-    # Debugging: log unmatched entries
+    # Drop columns we don’t need for modeling or display
+    merged_df.drop(columns=["Description"], inplace=True, errors="ignore")
+
+    # Debug log for unmatched Pokémon (names that exist in UniteAPI but not base CSV)
     unmatched = meta_df[~meta_df["Name"].isin(merged_df["Name"])]
     if not unmatched.empty:
         print("\n Unmatched Pokémon (from UniteAPI not found in base_df):") 
         print(unmatched["Name"].unique())
 
-    # Fill missing metadata columns with Average
+    # Fill any missing core stats with mean values
     average_columns = ["Offense", "Endurance", "Mobility", "Scoring", "Support"]
-    
-    # Fill missing Win / Loss with 0
-    merged_df["Win"] = merged_df["Win"].fillna(0).astype(int)
-    merged_df["Loss"] = merged_df["Loss"].fillna(0).astype(int)
-    
     for col in average_columns:
         merged_df[col] = merged_df[col].fillna(merged_df[col].mean()).round(1)
 
-    # Feature engineering
+    # Feature Engineering
     merged_df["Mobility_Offense"] = (merged_df["Mobility"] * merged_df["Offense"]).round(2)
     merged_df["Mobility_Endurance"] = (merged_df["Mobility"] * merged_df["Endurance"]).round(2)
     merged_df["Support_Scoring"] = (merged_df["Support"] * merged_df["Scoring"]).round(2)
     merged_df["MetaImpactScore"] = (merged_df["AdjustedWinRate"] * merged_df["UsageRate"]).round(2)
-    
-        # Extended Feature Engineering
+
+    # Map difficulty levels to numeric
     merged_df["AvgDifficulty"] = merged_df["UsageDifficulty"].map({
         "Novice": 1, "Intermediate": 2, "Expert": 3
     })
 
+    # One-hot encode roles and lanes
     role_counts = pd.get_dummies(merged_df["Role"], prefix="Role")
     merged_df = pd.concat([merged_df, role_counts], axis=1)
 
     if "PreferredLane" not in merged_df.columns:
         merged_df["PreferredLane"] = "Unknown"
-        
     lane_counts = pd.get_dummies(merged_df["PreferredLane"], prefix="Lane")
     merged_df = pd.concat([merged_df, lane_counts], axis=1)
 
-    # Feedback boosted win rate (simple adjustment for now)
+    # Feedback Boost Logic — Net Wins scaled and clipped to ±30
+    feedback_net = (merged_df["Win"] - merged_df["Loss"]).fillna(0).clip(-30, 30)
     merged_df["FeedbackBoostedWinRate"] = (
-        merged_df["AdjustedWinRate"] +
-        (merged_df["Win"].fillna(0) * 0.01) -
-        (merged_df["Loss"].fillna(0) * 0.01)
+        merged_df["AdjustedWinRate"] + (feedback_net * 0.01)
     ).clip(0, 1)
-    
-    # Sort data by "Name"
+
+    # Sort for consistency
     merged_df.sort_values("Name", inplace=True)
 
     # Prepare final model input

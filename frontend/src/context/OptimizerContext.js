@@ -68,17 +68,6 @@ export function OptimizerProvider({ children }) {
             return { winRate: 0, synergy: "Unknown", message: "", warning: "" };
         }
 
-        const tierWeights = {
-            "S": 1.4,
-            "A+": 1.2,
-            "A": 1.0,
-            "B+": 0.8,
-            "B": 0.6,
-            "C": 0.4,
-            "D": 0.2,
-            "Unknown": 0.8,
-        };
-
         const teamData = selectedPokemon.map(({ name }) => {
             const formatted = name
                 .split("-")
@@ -95,20 +84,16 @@ export function OptimizerProvider({ children }) {
             return { winRate: 0, synergy: "Unknown", message: "Missing Pokémon data", warning: "" };
         }
 
-        const adjustedWinRates = teamData.map(p => {
-            const raw = (p.FeedbackBoostedWinRate ?? p.AdjustedWinRate ?? p.WinRate ?? 0);
-            const tier = (p.Tier || "Unknown").toUpperCase();
-            const multiplier = tierWeights[tier] || tierWeights["Unknown"];
-            return raw * multiplier;
-        });
+        // Use FeedbackBoostedWinRate if available, fallback to Adjusted/Raw WinRate
+        const adjustedWinRates = teamData.map(p =>
+            p.FeedbackBoostedWinRate ?? p.AdjustedWinRate ?? (p.WinRate / 100) ?? 0
+        );
 
-        const maxMultiplier = Math.max(...Object.values(tierWeights));
-        const normalizedRates = adjustedWinRates.map(r => r / maxMultiplier); // scale to max 1
-
-        const avgWinRate = normalizedRates.reduce((sum, val) => sum + val, 0) / normalizedRates.length;
+        const avgWinRate = adjustedWinRates.reduce((sum, val) => sum + val, 0) / adjustedWinRates.length;
 
         let synergy = "Balanced";
         let message = "";
+
         if (avgWinRate < 0.35) {
             synergy = "Fragile";
             message = "Your team might struggle to hold objectives.";
@@ -118,7 +103,7 @@ export function OptimizerProvider({ children }) {
         }
 
         return {
-            winRate: Math.round(avgWinRate / 100),
+            winRate: Math.round(avgWinRate * 10000) / 100, // 0.528 → 52.8%
             synergy,
             message,
             warning: ""
