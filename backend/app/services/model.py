@@ -220,7 +220,7 @@ def predict_synergy_winrate(team_list: list[str]):
 
     # Predict
     team_preds = model.predict(X_input)
-    avg_win_rate = round(team_preds.mean(), 2)
+    avg_win_rate = round(team_preds.mean() * 10, 2)
 
     return {
         "team": team_list,
