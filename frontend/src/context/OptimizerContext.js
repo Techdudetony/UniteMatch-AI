@@ -18,9 +18,17 @@ export function OptimizerProvider({ children }) {
     // Fetch metadata
     useEffect(() => {
         fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/data-preview`)
-            .then(res => res.json())
-            .then(setPokemonData)
-            .catch(console.error);
+            .then(res => {
+                console.log("Response Status:", res.status);
+                return res.json();
+            })
+            .then(data => {
+                console.log("Pokémon Data Loaded:", data.slice(0, 5)); // Preview 5 entries
+                setPokemonData(data);
+            })
+            .catch(err => {
+                console.error("Failed to load Pokémon data:", err);
+            });
     }, []);
 
     console.log("Backend URL: ", process.env.NEXT_PUBLIC_BACKEND_URL);
@@ -86,7 +94,7 @@ export function OptimizerProvider({ children }) {
 
         // Use FeedbackBoostedWinRate if available, fallback to Adjusted/Raw WinRate
         const adjustedWinRates = teamData.map(p =>
-            p.FeedbackBoostedWinRate ?? p.AdjustedWinRate ?? (p.WinRate / 100) ?? 0
+            p.FeedbackBoostedWinRate ?? p.AdjustedWinRate ?? p.WinRate ?? 0
         );
 
         const avgWinRate = adjustedWinRates.reduce((sum, val) => sum + val, 0) / adjustedWinRates.length;
