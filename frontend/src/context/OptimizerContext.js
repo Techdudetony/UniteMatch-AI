@@ -96,13 +96,16 @@ export function OptimizerProvider({ children }) {
         }
 
         const adjustedWinRates = teamData.map(p => {
-            const raw = (p.FeedbackBoostedWinRate ?? p.AdjustedWinRate ?? p.WinRate ?? 0) / 100;
+            const raw = (p.FeedbackBoostedWinRate ?? p.AdjustedWinRate ?? p.WinRate ?? 0);
             const tier = (p.Tier || "Unknown").toUpperCase();
             const multiplier = tierWeights[tier] || tierWeights["Unknown"];
             return raw * multiplier;
         });
 
-        const avgWinRate = adjustedWinRates.reduce((sum, val) => sum + val, 0) / adjustedWinRates.length;
+        const maxMultiplier = Math.max(...Object.values(tierWeights));
+        const normalizedRates = adjustedWinRates.map(r => r / maxMultiplier); // scale to max 1
+
+        const avgWinRate = normalizedRates.reduce((sum, val) => sum + val, 0) / normalizedRates.length;
 
         let synergy = "Balanced";
         let message = "";
@@ -115,7 +118,7 @@ export function OptimizerProvider({ children }) {
         }
 
         return {
-            winRate: Math.round(avgWinRate * 100),
+            winRate: Math.round(avgWinRate),
             synergy,
             message,
             warning: ""
