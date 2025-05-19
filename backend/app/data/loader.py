@@ -79,7 +79,10 @@ def load_data():
         
         # Use blended rate when possible, else fall back to raw WinRate
         merged_df["AdjustedWinRate"] = merged_df["BlendedWinRate"]
-        merged_df["AdjustedWinRate"] = merged_df["AdjustedWinRate"].fillna(meta_df.set_index("Name").loc[merged_df["Name"], "WinRate"].values)
+        fallback_winrate = meta_df.set_index("Name")["WinRate"]
+        merged_df["AdjustedWinRate"] = merged_df["AdjustedWinRate"].combine_first(
+            merged_df["Name"].map(fallback_winrate)
+        )
         
         merged_df["Win"] = merged_df["Win"].fillna(0).astype(int)
         merged_df["Loss"] = merged_df["Loss"].fillna(0).astype(int)
