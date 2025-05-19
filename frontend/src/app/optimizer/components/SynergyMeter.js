@@ -16,7 +16,7 @@ export default function SynergyMeter() {
       <div className="relative w-80 h-80">
         <svg className="w-full h-full" viewBox="0 0 36 36">
           <path
-            strokeDasharray={`${winRate}, 100`}
+            strokeDasharray={`${winRate * 100}, 100`}
             d="M18 2.0845
                a 15.9155 15.9155 0 0 1 0 31.831
                a 15.9155 15.9155 0 0 1 0 -31.831"
@@ -27,7 +27,7 @@ export default function SynergyMeter() {
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
           <span className="text-4xl">Win Rate</span>
-          <span className="text-6xl font-bold">{isNaN(winRate) ? "?" : `${winRate.toFixed(2)}%`}</span>
+          <span className="text-6xl font-bold">{isNaN(winRate) ? "?" : `${(winRate * 100).toFixed(2)}%`}</span>
         </div>
       </div>
 
