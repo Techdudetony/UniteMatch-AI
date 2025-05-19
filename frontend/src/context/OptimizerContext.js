@@ -23,6 +23,8 @@ export function OptimizerProvider({ children }) {
             .catch(console.error);
     }, []);
 
+    console.log("Backend URL: ", process.env.NEXT_PUBLIC_BACKEND_URL);
+
     function refreshPokemonData() {
         fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/data-preview`)
             .then(res => res.json())
