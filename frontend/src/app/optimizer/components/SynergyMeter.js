@@ -27,7 +27,7 @@ export default function SynergyMeter() {
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
           <span className="text-4xl">Win Rate</span>
-          <span className="text-6xl font-bold">{isNaN(winRate) ? "?" : `${Math.min(winRate, 100).toFixed(2)}%`}</span> {/* Fix winRate to MAXIMUM 100% */}
+          <span className="text-6xl font-bold">{isNaN(winRate) ? "?" : `${winRate.toFixed(2)}%`}</span> {/* Fix winRate to MAXIMUM 100% */}
         </div>
       </div>
 
