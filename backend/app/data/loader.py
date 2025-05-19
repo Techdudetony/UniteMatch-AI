@@ -78,7 +78,7 @@ def load_data():
         merged_df["Loss"] = 0
     
     # Drop unnecessary description column
-    merged_df.drop(columns=["Description"], inplace=True)
+    merged_df.drop(columns=["Description"], errors="ignore", inplace=True)
 
     # Debugging: log unmatched entries
     unmatched = meta_df[~meta_df["Name"].isin(merged_df["Name"])]
