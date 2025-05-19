@@ -20,14 +20,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"], # will replace with domain in production
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 Base.metadata.create_all(bind=engine)
 
 # Route files
