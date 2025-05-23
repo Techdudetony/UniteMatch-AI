@@ -55,7 +55,7 @@ export default function Suggestions() {
   return (
     <div className="mt-6 text-center w-full">
       <h2 className="text-white text-xl font-bold mb-2 [text-shadow:_1px_1px_0_#000]">
-        Suggestioned Pokémon:
+        Suggested Pokémon:
       </h2>
 
       {isEmpty ? (
