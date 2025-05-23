@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from app.services.model import optimize_team, build_model, predict_synergy_winrate
+import traceback
 
 router = APIRouter()
 
@@ -14,6 +15,8 @@ def optimize(request: TeamRequest):
         result = optimize_team(request.team)
         return {"optimized": result}
     except Exception as e:
+        print("🔥 ERROR in /optimize-team:")
+        traceback.print_exc()  # This shows the full error traceback in the Render logs
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.get("/train-model")
