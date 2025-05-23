@@ -146,7 +146,7 @@ def optimize_team(team_list: list[str]):
     final_df, df = load_data()
 
     clf, encoder = load_model()
-    features = clf.feature_name_
+    features = [f for f in clf.feature_name_ if f in final_df.columns]
 
     df["Name"] = df["Name"].astype(str)
     team_list = [normalize_name(name) for name in team_list]
