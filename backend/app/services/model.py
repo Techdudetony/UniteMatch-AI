@@ -260,9 +260,11 @@ def compute_synergy_features(team_df: pd.DataFrame) -> pd.DataFrame:
 
 def load_model():
     """Load pretrained LightGBM model, label encoder, and feature list."""
-    model_path = "backend/app/models/lightgbm_model.pkl"
-    encoder_path = "backend/app/models/label_encoder.pkl"
-    features_path = "backend/app/models/feature_list.pkl"
+    MODEL_DIR = os.path.join(os.path.dirname(__file__), "../models")
+
+    model_path = os.path.join(MODEL_DIR, "lightgbm_model.pkl")
+    encoder_path = os.path.join(MODEL_DIR, "label_encoder.pkl")
+    features_path = os.path.join(MODEL_DIR, "feature_list.pkl")
 
     if not all(os.path.exists(p) for p in [model_path, encoder_path, features_path]):
         raise FileNotFoundError("Model, encoder, or feature list not found.")
