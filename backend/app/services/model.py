@@ -1,4 +1,5 @@
-import os
+import os, sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 import pandas as pd
 import joblib
 from datetime import datetime
@@ -101,6 +102,7 @@ def build_model(tune: bool = False):
     os.makedirs("backend/app/models", exist_ok=True)
     joblib.dump(clf, "backend/app/models/lightgbm_model.pkl")
     joblib.dump(encoder, "backend/app/models/label_encoder.pkl")
+    joblib.dump(list(X.columns), "backend/app/models/feature_list.pkl")
 
     return {
         "model": clf,
@@ -142,17 +144,19 @@ def log_training_result(accuracy, params, feature_importance, f1):
             writer.to_csv(file, header=False, index=False)
 
 def optimize_team(team_list: list[str]):
-    """Predict difficulty level for a team of selected Pokémon."""
     final_df, df = load_data()
+    clf, encoder, expected_features = load_model()
 
-    clf, encoder = load_model()
-    features = [f for f in clf.feature_name_ if f in final_df.columns]
+    # Fill any missing expected feature columns with 0
+    for col in expected_features:
+        if col not in final_df.columns:
+            final_df[col] = 0
 
     df["Name"] = df["Name"].astype(str)
     team_list = [normalize_name(name) for name in team_list]
     mask = df["Name"].isin(team_list)
     team_df = df[mask]
-    X_team = final_df.loc[mask, features]
+    X_team = final_df.loc[mask, expected_features]
 
     if team_df.empty or len(team_df) != len(team_list):
         missing = set(team_list) - set(team_df["Name"])
@@ -252,14 +256,16 @@ def compute_synergy_features(team_df: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame([features])
 
 def load_model():
-    """Load pretrained LightGBM model and label encoder."""
+    """Load pretrained LightGBM model, label encoder, and feature list."""
     model_path = "backend/app/models/lightgbm_model.pkl"
     encoder_path = "backend/app/models/label_encoder.pkl"
+    features_path = "backend/app/models/feature_list.pkl"
 
-    if not os.path.exists(model_path) or not os.path.exists(encoder_path):
-        raise FileNotFoundError("Pretrained model or encoder not found. Please train and save the model first.")
+    if not all(os.path.exists(p) for p in [model_path, encoder_path, features_path]):
+        raise FileNotFoundError("Model, encoder, or feature list not found.")
 
     model = joblib.load(model_path)
     encoder = joblib.load(encoder_path)
+    features = joblib.load(features_path)
 
-    return model, encoder
+    return model, encoder, features
