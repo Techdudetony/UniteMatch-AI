@@ -34,6 +34,9 @@ def build_model(tune: bool = False):
     target = "UsageDifficulty"
     X = features
     y = df[target]
+        
+    # Fill any missing values (needed for SMOTE)
+    X = X.fillna(0)
 
     # Optional: visualize correlations before modeling
     plot_correlation(final_df, X.columns)
@@ -269,3 +272,7 @@ def load_model():
     features = joblib.load(features_path)
 
     return model, encoder, features
+
+if __name__ == "__main__":
+    result = build_model(tune=False)
+    print("✅ Model training complete.")
