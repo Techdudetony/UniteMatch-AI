@@ -74,7 +74,7 @@ export default function OptimizerControls() {
       ]);
     }
   };
-  
+
   const [activeRole, setActiveRole] = useState("Attacker");
 
   const roleInfo = {
@@ -253,7 +253,7 @@ export default function OptimizerControls() {
           <div className="bg-white p-6 rounded-xl shadow-2xl max-w-xl w-full relative">
             <button
               onClick={() => setShowRoleModal(false)}
-              className="absolute top-2 right-2 text-gray-600 hover:text-black"
+              className="absolute top-2 right-2 text-gray-600 cursor-pointer hover:text-black"
             >
               ✖
             </button>
