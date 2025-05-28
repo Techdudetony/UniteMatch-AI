@@ -75,7 +75,15 @@ export default function OptimizerControls() {
   return (
     <div className="rounded-2xl border-4 border-black p-8 bg-gradient-to-b from-orange-400 via-pink-500 to-purple-600 shadow-xl w-[500px]">
       {/* Role */}
-      <label className="block text-white font-bold [text-shadow:_1px_1px_0_#000] mb-1">Pokemon Role</label>
+      <div className="flex items-center gap-1 mb-1">
+        <label className="text-white font-bold [text-shadow:_1px_1px_0_#000]">Pokemon Role</label>
+        <div className="relative group">
+          <span className="text-white cursor-pointer text-sm bg-black bg-opacity-40 px-1 rounded-full leading-none">?</span>
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-[220px] bg-black text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 shadow-lg">
+            Select a Pokémon role to filter which Pokémon appear below.
+          </div>
+        </div>
+      </div>
       <select
         value={role}
         onChange={(e) => setRole(e.target.value)}
@@ -88,7 +96,15 @@ export default function OptimizerControls() {
       </select>
 
       {/* Lane */}
-      <label className="block text-white font-bold [text-shadow:_1px_1px_0_#000] mb-1">Lane</label>
+      <div className="flex items-center gap-1 mb-1">
+        <label className="text-white font-bold [text-shadow:_1px_1px_0_#000]">Lane</label>
+        <div className="relative group">
+          <span className="text-white cursor-pointer text-sm bg-black bg-opacity-40 px-1 rounded-full leading-none">?</span>
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-[220px] bg-black text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 shadow-lg">
+            Choose your preferred lane for this Pokémon.
+          </div>
+        </div>
+      </div>
       <select
         value={lane}
         onChange={(e) => setLane(e.target.value)}
