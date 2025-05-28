@@ -202,7 +202,7 @@ export default function OptimizerControls() {
             </button>
             <h2 className="text-xl font-bold mb-2 text-center text-purple-700">What is a Lane?</h2>
             <p className="text-sm text-gray-700 mb-4 text-center">
-              Lanes refer to the paths your Pokémon take in battle. Here's how they work on the map:
+              Lanes refer to the paths your Pokémon take in battle. Here&apos;s how they work on the map:
             </p>
             <img src="/map.png" alt="Unite Map Lanes" className="rounded shadow-md mx-auto" />
           </div>
