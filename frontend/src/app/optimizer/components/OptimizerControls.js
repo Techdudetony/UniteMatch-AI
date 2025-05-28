@@ -39,6 +39,7 @@ export default function OptimizerControls() {
   const limit = stackSize === "3 Stack" ? 3 : 5;
 
   const [showLaneModal, setShowLaneModal] = useState(false);
+  const [showRoleModal, setShowRoleModal] = useState(false);
 
   // Search ignores role filter, shows from all Pokémon
   const searchFiltered = allPokemon.filter(name =>
@@ -73,6 +74,36 @@ export default function OptimizerControls() {
       ]);
     }
   };
+  
+  const [activeRole, setActiveRole] = useState("Attacker");
+
+  const roleInfo = {
+    Attacker: {
+      desc: "High damage output but low durability. Best for dealing ranged or burst damage.",
+      examples: ["Pikachu", "Greninja", "Delphox"],
+      color: "text-orange-500",
+    },
+    Defender: {
+      desc: "Takes hits for the team and protects goals. Often has crowd control abilities.",
+      examples: ["Snorlax", "Crustle", "Mamoswine"],
+      color: "text-blue-500",
+    },
+    Support: {
+      desc: "Heals, buffs, and helps control the battlefield. Essential for team success.",
+      examples: ["Eldegoss", "Blissey", "Hoopa"],
+      color: "text-pink-500",
+    },
+    Speedster: {
+      desc: "Moves quickly and bursts enemies down. Ideal for jungling and picking off squishies.",
+      examples: ["Zeraora", "Absol", "Gengar"],
+      color: "text-green-500",
+    },
+    "All-Rounder": {
+      desc: "Balanced between offense and defense. Great in any lane or role.",
+      examples: ["Lucario", "Charizard", "Tsareena"],
+      color: "text-purple-500",
+    },
+  };
 
   return (
     <div className="rounded-2xl border-4 border-black p-8 bg-gradient-to-b from-orange-400 via-pink-500 to-purple-600 shadow-xl w-[500px]">
@@ -80,9 +111,15 @@ export default function OptimizerControls() {
       <div className="flex items-center gap-1 mb-1">
         <label className="text-white font-bold [text-shadow:_1px_1px_0_#000]">Pokemon Role</label>
         <div className="relative group">
-          <span className="text-black cursor-pointer text-md font-bold bg-white bg-opacity-40 ml-2 px-2 rounded-full leading-none">?</span>
+          <button
+            onClick={() => setShowRoleModal(true)}
+            className="text-black cursor-pointer text-md font-bold bg-white bg-opacity-40 ml-2 py-1 px-2 rounded-full leading-none"
+          >
+            ?
+          </button>
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-[220px] bg-black text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 shadow-lg">
-            Select a Pokémon role to filter which Pokémon appear below.
+            Learn about each Pokémon role.
+            Click for more info.
           </div>
         </div>
       </div>
@@ -191,6 +228,7 @@ export default function OptimizerControls() {
         </p>
       )}
 
+      {/* Lane Modal */}
       {showLaneModal && (
         <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/30 flex items-center justify-center">
           <div className="bg-white p-6 rounded-xl shadow-2xl max-w-lg w-full relative">
@@ -205,6 +243,58 @@ export default function OptimizerControls() {
               Lanes refer to the paths your Pokémon take in battle. Here&apos;s how they work on the map:
             </p>
             <img src="/map.png" alt="Unite Map Lanes" className="rounded shadow-md mx-auto" />
+          </div>
+        </div>
+      )}
+
+      {/* Role Modal */}
+      {showRoleModal && (
+        <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/30 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-xl shadow-2xl max-w-xl w-full relative">
+            <button
+              onClick={() => setShowRoleModal(false)}
+              className="absolute top-2 right-2 text-gray-600 hover:text-black"
+            >
+              ✖
+            </button>
+            <h2 className="text-xl font-bold mb-4 text-center text-purple-700">Pokémon Roles Explained</h2>
+
+            {/* Tabs */}
+            <div className="flex justify-center gap-2 mb-4">
+              {roles.map((r) => (
+                <button
+                  key={r}
+                  onClick={() => setActiveRole(r)}
+                  className={`px-3 py-1 text-sm font-semibold rounded-full border transition 
+              ${activeRole === r ? "bg-purple-600 text-white border-purple-600" : "bg-white text-black border-gray-300 hover:bg-gray-100"}
+            `}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
+
+            {/* Role Info */}
+            <div className="text-center">
+              <p className={`text-sm mb-3 ${roleInfo[activeRole].color}`}>
+                {roleInfo[activeRole].desc}
+              </p>
+
+              <p className="text-xs text-gray-600 mb-2">
+                <strong>Examples:</strong>
+              </p>
+
+              <div className="flex justify-center gap-4 items-end">
+                {roleInfo[activeRole].examples.map((name) => (
+                  <img
+                    key={name}
+                    src={`/pokemon/${name.toLowerCase().replace(/ /g, "-")}.png`}
+                    alt={name}
+                    className="w-16 h-16 drop-shadow-md hover:scale-110 transition-transform"
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )}
