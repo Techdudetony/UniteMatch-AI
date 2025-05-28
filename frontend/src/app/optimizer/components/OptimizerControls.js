@@ -38,6 +38,8 @@ export default function OptimizerControls() {
   const [search, setSearch] = useState("");
   const limit = stackSize === "3 Stack" ? 3 : 5;
 
+  const [showLaneModal, setShowLaneModal] = useState(false);
+
   // Search ignores role filter, shows from all Pokémon
   const searchFiltered = allPokemon.filter(name =>
     name.includes(search.toLowerCase())
@@ -78,7 +80,7 @@ export default function OptimizerControls() {
       <div className="flex items-center gap-1 mb-1">
         <label className="text-white font-bold [text-shadow:_1px_1px_0_#000]">Pokemon Role</label>
         <div className="relative group">
-          <span className="text-white cursor-pointer text-sm bg-black bg-opacity-40 px-1 rounded-full leading-none">?</span>
+          <span className="text-black cursor-pointer text-md font-bold bg-white bg-opacity-40 ml-2 px-2 rounded-full leading-none">?</span>
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-[220px] bg-black text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 shadow-lg">
             Select a Pokémon role to filter which Pokémon appear below.
           </div>
@@ -99,9 +101,12 @@ export default function OptimizerControls() {
       <div className="flex items-center gap-1 mb-1">
         <label className="text-white font-bold [text-shadow:_1px_1px_0_#000]">Lane</label>
         <div className="relative group">
-          <span className="text-white cursor-pointer text-sm bg-black bg-opacity-40 px-1 rounded-full leading-none">?</span>
+          <button onClick={() => setShowLaneModal(true)} className="text-black cursor-pointer text-md font-bold bg-white bg-opacity-40 ml-2 py-1 px-2 rounded-full leading-none">
+            ?
+          </button>
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-[220px] bg-black text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 shadow-lg">
             Choose your preferred lane for this Pokémon.
+            Click for more info.
           </div>
         </div>
       </div>
@@ -184,6 +189,24 @@ export default function OptimizerControls() {
         <p className="text-white text-sm italic text-center mt-4">
           Please select a role and lane to continue.
         </p>
+      )}
+
+      {showLaneModal && (
+        <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/30 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-xl shadow-2xl max-w-lg w-full relative">
+            <button
+              onClick={() => setShowLaneModal(false)}
+              className="absolute cursor-pointer top-2 right-2 text-gray-600 hover:text-black"
+            >
+              ✖
+            </button>
+            <h2 className="text-xl font-bold mb-2 text-center text-purple-700">What is a Lane?</h2>
+            <p className="text-sm text-gray-700 mb-4 text-center">
+              Lanes refer to the paths your Pokémon take in battle. Here's how they work on the map:
+            </p>
+            <img src="/map.png" alt="Unite Map Lanes" className="rounded shadow-md mx-auto" />
+          </div>
+        </div>
       )}
     </div>
   );
