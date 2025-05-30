@@ -22,14 +22,14 @@ export default function FeedbackModal({ visible, onClose, team = [] }) {
 
             // Toast message
             if (result === "win") {
-                toast.success("🎉 Victory! Great Teamwork out there!", {
+                toast.success("Feedback Received: 🎉 Victory! Great Teamwork out there!", {
                     style: {
                         fontWeight: "bold",
                         fontSize: "16px"
                     }
                 });
             } else if (result === "loss") {
-                toast("💪 Tough Loss - Keep training, Trainer!", {
+                toast("Feedback Received: 💪 Tough Loss - Keep training, Trainer!", {
                     style: {
                         fontWeight: "bold",
                         fontSize: "16px"

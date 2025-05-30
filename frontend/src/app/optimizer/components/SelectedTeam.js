@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import Image from "next/image";
 import { useOptimizer } from "@/context/OptimizerContext";
 import FeedbackModal from "./FeedbackModal";
@@ -123,26 +124,36 @@ export default function SelectedTeam() {
 
         {/* Export & Reset Buttons */}
         <div className="flex justify-end gap-4 mt-6">
-          <button
-            onClick={handleExport}
-            disabled={selectedPokemon.length === 0}
-            className={`${selectedPokemon.length === 0
-              ? "opacity-50 cursor-not-allowed"
-              : ""
-              } bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-xl shadow-md transition`}
-          >
-            Export
-          </button>
-          <button
-            onClick={() => setSelectedPokemon([])}
-            disabled={selectedPokemon.length === 0}
-            className={`${selectedPokemon.length === 0
-              ? "opacity-50 cursor-not-allowed"
-              : ""
-              } bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-xl shadow-md transition`}
-          >
-            Reset
-          </button>
+          <div className="relative group">
+            <button
+              onClick={handleExport}
+              disabled={selectedPokemon.length === 0}
+              className={`${selectedPokemon.length === 0
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+                } bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-xl shadow-md transition`}
+            >
+              Export & Submit Feedback
+            </button>
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-[200px] bg-black text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 shadow-lg">
+              Submit your match result to improve future suggestions.
+            </div>
+          </div>
+          <div className="relative group">
+            <button
+              onClick={() => setSelectedPokemon([])}
+              disabled={selectedPokemon.length === 0}
+              className={`${selectedPokemon.length === 0
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+                } bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-xl shadow-md transition`}
+            >
+              Reset
+            </button>
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-[200px] bg-black text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 shadow-lg">
+              Clear your selected team to start fresh.
+            </div>
+          </div>
         </div>
 
         {/* Feedback Modal */}
